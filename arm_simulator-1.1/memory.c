@@ -102,6 +102,7 @@ int memory_write_byte(memory mem, uint32_t address, uint8_t value)
 	*(mem ->address + address) = value;
 	return 0;
 }
+/* Test*/
 
 int memory_write_half(memory mem, int be, uint32_t address, uint16_t value)
 {
