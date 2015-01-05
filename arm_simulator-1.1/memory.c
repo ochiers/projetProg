@@ -78,3 +78,5 @@ int memory_write_half(memory mem, int be, uint32_t address, uint16_t value) {
 int memory_write_word(memory mem, int be, uint32_t address, uint32_t value) {
     return -1;
 }
+
+/* Test */ 
