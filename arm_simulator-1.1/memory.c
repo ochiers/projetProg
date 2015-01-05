@@ -97,7 +97,7 @@ int memory_read_word(memory mem, int be, uint32_t address, uint32_t *value)
 
 int memory_write_byte(memory mem, uint32_t address, uint8_t value)
 {
-	if ((address < 0) || (address >= mem->size))	return -1;
+	if ((address < 0) || (address > mem->size - 1))	return -1;
 
 	*(mem ->address + address) = value;
 	return 0;
@@ -105,28 +105,44 @@ int memory_write_byte(memory mem, uint32_t address, uint8_t value)
 
 int memory_write_half(memory mem, int be, uint32_t address, uint16_t value)
 {
-	if ((address < 0) || (address >= mem->size-1))	return -1;
+	if ((address < 0) || (address > mem->size - 2))	return -1;
 
 	uint16_t a =  value >> 8;
 	uint16_t b =  value & 0xFF;
 
-	if (be)	* (mem->address + address) = value;
-	else	* (mem->address + address) = b<<8 | a;
-printf("\n*** half: memoire = %x\n", * (mem->address + address));
+	if (be) {
+		*(mem->address + address) = a;
+		*(mem->address + address +1) = b;
+	}
+	else {
+		*(mem->address + address) = b;
+		*(mem->address + address +1) = a;
+	}
+	
 	return 0;
 }
 
 int memory_write_word(memory mem, int be, uint32_t address, uint32_t value)
 {
-	if ((address < 0) || (address >= mem->size-3))	return -1;
+	if ((address < 0) || (address > mem->size - 4))	return -1;
 
 	uint32_t a =  (value >> 24)	& 0xFF;
 	uint32_t b =  (value >> 16)	& 0xFF;
 	uint32_t c =  (value >> 8)	& 0xFF;
 	uint32_t d =  value		& 0xFF;
 
-	if (!be)	* (mem->address + address) = value;
-	else	* (mem->address + address) = d<<24 | c<<16 | b<<8 | a;
-printf("\n***     memoire = %x\n", * (mem->address + address));
+	if (be) {
+		*(mem->address + address) = a;
+		*(mem->address + address +1) = b;
+		*(mem->address + address +2) = c;
+		*(mem->address + address +3) = d;
+	}
+	else {
+		*(mem->address + address) = d;
+		*(mem->address + address +1) = c;
+		*(mem->address + address +2) = b;
+		*(mem->address + address +3) = a;
+	}
+	
 	return 0;
 }
