@@ -1,3 +1,5 @@
+/* Ceci est un teste */
+
 /*
 Armator - simulateur de jeu d'instruction ARMv5T à but pédagogique
 Copyright (C) 2011 Guillaume Huard
