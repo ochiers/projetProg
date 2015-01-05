@@ -88,30 +88,38 @@ int main() {
     position = (uint8_t *) & word_value;
     for (i=0; i<4; i++)
         memory_write_byte(m, i, *(position++));
+        
     printf("- word read with the same endianess as me, ");
     memory_read_word(m, is_big_endian(), 0, &word_read);
     print_test(compare(&word_value, &word_read, 4, 0));
+    
     printf("- half read with the same endianess as me, ");
     memory_read_half(m, is_big_endian(), 0, &half_read);
     print_test(compare(&word_value, &half_read, 2, 0));
+    
     printf("- word read with a different endianess than me, ");
     memory_read_word(m, 1-is_big_endian(), 0, &word_read);
     print_test(compare(&word_value, &word_read, 4, 1));
+    
     printf("- half read with a different endianess than me, ");
     memory_read_half(m, 1-is_big_endian(), 0, &half_read);
     print_test(compare(&word_value, &half_read, 2, 1));
 
     printf("Writing word and half at address 0, then reading the bytes, "
            "the result should depend on simulated memory endianess :\n");
+           
     printf("- word write with the same endianess as me, ");
     memory_write_word(m, is_big_endian(), 0, word_value);
     print_test(compare_with_sim(&word_value, m, 4, 0));
+    
     printf("- half write with the same endianess as me, ");
     memory_write_half(m, is_big_endian(), 0, half_value);
     print_test(compare_with_sim(&half_value, m, 2, 0));
+    
     printf("- word write with a different endianess than me, ");
     memory_write_word(m, 1-is_big_endian(), 0, word_value);
     print_test(compare_with_sim(&word_value, m, 4, 1));
+    
     printf("- half write with a different endianess than me, ");
     memory_write_half(m, 1-is_big_endian(), 0, half_value);
     print_test(compare_with_sim(&half_value, m, 2, 1));
