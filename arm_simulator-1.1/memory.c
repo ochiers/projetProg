@@ -81,3 +81,4 @@ int memory_write_word(memory mem, int be, uint32_t address, uint32_t value) {
 
 /* Test */
 /* Test Bis */ 
+/* Test Bis 2 */ 
