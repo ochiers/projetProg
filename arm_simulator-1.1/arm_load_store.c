@@ -27,8 +27,23 @@ Contact: Guillaume.Huard@imag.fr
 #include "debug.h"
 
 int arm_load_store(arm_core p, uint32_t ins) {
+
+	int I = get_bit(ins, 25);	
+	int P = get_bit(ins, 24);
+	int U = get_bit(ins, 23);
+	int B = get_bit(ins, 22);
+	int W = get_bit(ins, 21);
+	int L = get_bit(ins, 20);
 	
-	int L = 
+	uint32_t address; // Contenu de Rn 
+	int shift = get_bits(ins, 7, 5);
+	
+	if(L) { // Load
+		
+	}
+	else { // Store
+		
+	}
 	
     return UNDEFINED_INSTRUCTION;
 }
