@@ -20,6 +20,8 @@ Contact: Guillaume.Huard@imag.fr
          51 avenue Jean Kuntzmann
          38330 Montbonnot Saint-Martin
 */
+#define PC_USER 15
+
 #include "arm_exception.h"
 #include "arm_constants.h"
 #include "arm_core.h"
@@ -38,6 +40,6 @@ void arm_exception(arm_core p, unsigned char exception) {
     /* Semantics of reset interrupt (ARM manual A2-18) */
     if (exception == RESET) {
         arm_write_cpsr(p, 0x1d3 | Exception_bit_9);
-	arm_write_usr_register(p, 15, 0);
+	arm_write_usr_register(p, PC_USER, 0);
     }
 }
