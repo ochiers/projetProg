@@ -20,6 +20,9 @@ Contact: Guillaume.Huard@imag.fr
          51 avenue Jean Kuntzmann
          38330 Montbonnot Saint-Martin
 */
+
+#define PC_USER 15
+
 #include "arm_instruction.h"
 #include "arm_exception.h"
 #include "arm_data_processing.h"
@@ -31,12 +34,17 @@ Contact: Guillaume.Huard@imag.fr
 static int arm_execute_instruction(arm_core p) {
     return 0;
 }
-
+ 
 int arm_step(arm_core p) {
     int result;
 
     result = arm_execute_instruction(p);
-    if (result)
+      			arm_write_usr_register(p, PC_USER, arm_read_usr_register(p,PC_USER)+4);
+  			printf("%d", arm_read_usr_register(p,PC_USER));  
+    if (result){
         arm_exception(p, result);
+  
+    	}
+    	
     return result;
 }
