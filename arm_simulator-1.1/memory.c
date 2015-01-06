@@ -77,20 +77,20 @@ void memory_destroy(memory mem)
 // --------------------------------------------------
 // Lit un octet dans mem a l'adresse donnee dans la memoire en entree
 // Place le resultat dans value
-// Rend -1 en cas d'erreur et la taille lue en octet si non
+// Rend -1 en cas d'erreur
 // --------------------------------------------------
 int memory_read_byte(memory mem, uint32_t address, uint8_t *value)
 {
 	if ((address < 0) || (address >= mem->size))	return -1;
 
 	*value = (uint8_t)*(mem->address + address);
-	return 1;
+	return 0;
 }
 // --------------------------------------------------
 // Lit 2 octet dans mem a l'adresse donnee dans la memoire en entree
 // Place le resultat dans value
 // be indique l'endianness de la memoire et du resultat
-// Rend -1 en cas d'erreur et la taille lue en octet si non
+// Rend -1 en cas d'erreur
 // --------------------------------------------------
 int memory_read_half(memory mem, int be, uint32_t address, uint16_t *value)
 {
@@ -101,13 +101,13 @@ int memory_read_half(memory mem, int be, uint32_t address, uint16_t *value)
 
 	if (be)	*value = a << 8 | b;
 	else	*value = b << 8 | a;
-	return 2;
+	return 0;
 }
 // --------------------------------------------------
 // Lit 4 octet dans mem a l'adresse donnee dans la memoire en entree
 // Place le resultat dans value
 // be indique l'endianness de la memoire et du resultat
-// Rend -1 en cas d'erreur et la taille lue en octet si non
+// Rend -1 en cas d'erreur 
 // --------------------------------------------------
 int memory_read_word(memory mem, int be, uint32_t address, uint32_t *value)
 {
@@ -120,25 +120,25 @@ int memory_read_word(memory mem, int be, uint32_t address, uint32_t *value)
 
 	if (be)	*value = a << 24 | b << 16 | c << 8 | d;
 	else	*value = d << 24 | c << 16 | b << 8 | a;
-	return 4;
+	return 0;
 }
 // --------------------------------------------------
 // Ecrit 1 octet dans mem a l'adresse donnee dans la memoire en entree
 // Place le resultat dans value
-// Rend -1 en cas d'erreur et le nombre d'octets ecrits si non
+// Rend -1 en cas d'erreur
 // --------------------------------------------------
 int memory_write_byte(memory mem, uint32_t address, uint8_t value)
 {
 	if ((address < 0) || (address > mem->size - 1))	return -1;
 
 	*(mem ->address + address) = value;
-	return 1;
+	return 0;
 }
 // --------------------------------------------------
 // Ecrit 2 octet dans mem a l'adresse donnee dans la memoire en entree
 // Place le resultat dans value
 // be indique l'endianness de la memoire et de value
-// Rend -1 en cas d'erreur et le nombre d'octets ecrits si non
+// Rend -1 en cas d'erreur
 // --------------------------------------------------
 int memory_write_half(memory mem, int be, uint32_t address, uint16_t value)
 {
@@ -157,13 +157,13 @@ int memory_write_half(memory mem, int be, uint32_t address, uint16_t value)
 		*(mem->address + address +1) = a;
 	}
 	
-	return 2;
+	return 0;
 }
 // --------------------------------------------------
 // Ecrit 4 octet dans mem a l'adresse donnee dans la memoire en entree
 // Place le resultat dans value
 // be indique l'endianness de la memoire et de value
-// Rend -1 en cas d'erreur et le nombre d'octets ecrits si non
+// Rend -1 en cas d'erreur
 // --------------------------------------------------
 int memory_write_word(memory mem, int be, uint32_t address, uint32_t value)
 {
@@ -187,5 +187,5 @@ int memory_write_word(memory mem, int be, uint32_t address, uint32_t value)
 		*(mem->address + address +3) = a;
 	}
 	
-	return 4;
+	return 0;
 }
