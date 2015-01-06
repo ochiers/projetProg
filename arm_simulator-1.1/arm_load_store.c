@@ -27,6 +27,9 @@ Contact: Guillaume.Huard@imag.fr
 #include "debug.h"
 
 int arm_load_store(arm_core p, uint32_t ins) {
+	
+	int L = 
+	
     return UNDEFINED_INSTRUCTION;
 }
 
