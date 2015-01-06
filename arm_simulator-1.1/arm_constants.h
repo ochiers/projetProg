@@ -104,7 +104,7 @@ Contact: Guillaume.Huard@imag.fr
 #define COND_GT	12	//1100
 #define COND_LE	13	//1101
 #define COND_AL	14	//1110
-#define COND_-	15	//1111
+#define COND_ZZ	15	//1111
 
 
 char *arm_get_exception_name(unsigned char exception);
