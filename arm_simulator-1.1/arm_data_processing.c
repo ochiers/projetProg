@@ -38,17 +38,18 @@ Contact: Guillaume.Huard@imag.fr
 //	- S: 		indique si les codes conditions doivent etre mis a jours
 // Rend -1 en cas d'erreur et 0 si non
 // ------------------------------------------
-char readOperand(arm_core p, uint32_t ins, uint32_t *o1, uint32_t *o2, uint8_t *rd, uint8_t *S)
+char readOperand(arm_core p, uint32_t ins, uint64_t *o1, uint64_t *o2, uint8_t *rd, uint8_t *S, uint8_t *op)
 {
 	uint8_t irn, I;
 
-	*rd	= (ins & 0x00F000) >> 12;				// Calcule numero registre dest
-	irn	= (ins & 0x0F0000) >> 16;				// Calcule numero registre src 1
-	*S	= (ins & 0x100000) >> 20;				// Calcule le bit S
+	*rd	= (ins & 0x000F000) >> 12;				// Calcule numero registre dest
+	irn	= (ins & 0x00F0000) >> 16;				// Calcule numero registre src 1
+	*S	= (ins & 0x0100000) >> 20;				// Calcule le bit S
+	*op	= (ins & 0x1E00000) >> 21;				// Calcule le code operation
+	*o1	= (uint64_t)arm_read_register(p, irn);			// Calcule Operande 1
 
-	*o1 = arm_read_register(p, irn);				// Calcule Operande 1
 	I = ins & 0x3000000;
-	if (I)	*o2 = rd;						// Calcule Operande 2
+	if (I)	*o2 = rd;						// Calcule Operande 2		// *********************** A completer: voir p 442 et 443
 	else
 	{
 		if ((rd < 0) || (rd > 15))	return -1;	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% a faire
@@ -57,62 +58,76 @@ char readOperand(arm_core p, uint32_t ins, uint32_t *o1, uint32_t *o2, uint8_t *
 	return 0;
 }
 // ------------------------------------------
-// Ecrit le code condition dans le registre CPSR de p
-//	- cond:	valeur des flag ZNCV: Z en 0, N en 1 ....
+// Ecrit le code condition dans le registre
+// CPSR de p en fonction du resultat du calcul res
 // ------------------------------------------
-void writeCondition(arm_core p, uint8_t cond)
+void writeCondition(arm_core p, uint64_t res)
 {
-	if (cond & 0x1)	set_bit(p->cpsr, Z);
-	else		clr_bit(p->cpsr, Z);
-	if (cond & 0x2)	set_bit(p->cpsr, N);
-	else		clr_bit(p->cpsr, N);
-	if (cond & 0x4)	set_bit(p->cpsr, C);
-	else		clr_bit(p->cpsr, C);
-	if (cond & 0x8)	set_bit(p->cpsr, V);
-	else		clr_bit(p->cpsr, V);
+	if (res == 0)		set_bit(p->cpsr, Z);
+	else			clr_bit(p->cpsr, Z);
+	if (res & 0x080000000)	set_bit(p->cpsr, N);
+	else			clr_bit(p->cpsr, N);
+	if (res & 0x100000000)	set_bit(p->cpsr, C);
+	else			clr_bit(p->cpsr, C);
+	if (res > 0x0FFFFFFFF)	set_bit(p->cpsr, V);
+	else			clr_bit(p->cpsr, V);
 }
 // ------------------------------------------
 // Calcule o1 op o2
 // Parametre d'entree:
-//	- o1, o2:	Valeur des operandes 1 et 2
+//	- o1, o2:	Valeur des operandes 1 et 2 sur 64 bit (32 bit + des 0)
 // Parametre de sortie:
-//	- res:	resultat du calcul
-//	- cond:	valeur des flag ZNCV: Z en 0, N en 1 ....
+//	- res:	resultat du calcul sur 64 bits
 // ------------------------------------------
-void add(uint32_t o1, uint32_t o2, uint32_t *res, uint8_t cond)
+uint64_t eor(uint64_t o0, uint64_t o1)
 {
-	uint64_t r = (uint64_t)o1 + (uint64_t)o2;
+	uint64_t res = 0;
+	char i, b0, b1;
 
-	*cond = 0;
-	if (r == 0)	*cond |= 0x1;		// Condition Z
-/////	if (r)	*cond |= 0x2;			// Condition N			//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% a faire
-/////	if ()	*cond |= 0x4;			// Condition C			//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% a faire
-	if (r >0xFFFFFFFF)	*cond |= 0x8;	// Condition V
-	*res = (uint32_t)r;
+	for (i=0; i<32; i++)
+	{
+		b0 = get_bit(o0, i);
+		b1 = get_bit(o1, i);
+		res |= (((b0 | b1) & ~(b0 & b1)) >> i);
+	}
+	return res;
 }
-
-/* Decoding functions for different classes of instructions */
+// ------------------------------------------
+// Decoding functions for different classes of instructions
+// ------------------------------------------
 int arm_data_processing_shift(arm_core p, uint32_t ins)
 {
-	uint32_t o0, o1, res;
-	uint8_t rd, S, cond;
+	uint64_t res=0, o0, o1;
+	uint8_t rd, S, cond, op;
 	char test;
 
-	test = readOperand(p, ins, &o0, &o1, &rd, &S);
+	test = readOperand(p, ins, &o0, &o1, &rd, &S, &op);
 
 	if (test == -1)	return UNDEFINED_INSTRUCTION;	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% a faire
 	switch(i)
 	{
-		case INSTR_ADD:	test = add(o1, o2, *res, *cond);	break;
-		case INSTR_EOR:	test = eor(o1, o2, *res, *cond);	break;
-		case INSTR_SUB:	test = sub(o1, o2, *res, *cond);	break;
+		case INSTR_AND:	res = o0 & o1;				break;
+		case INSTR_EOR:	res = eor(o0, o1);			break;
+		case INSTR_SUB:	res = o0 - o1;				break;
+		case INSTR_RSB:	res = o1 - o0;				break;
+		case INSTR_ADD:	res = o0 + o1;				break;
+		case INSTR_ADC:	res = o0 + o1 + (p->cpsr & (1<<C));	break;
+		case INSTR_SBC:	break;				// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% voir page 275
+		case INSTR_RSC:	test = rsc(o1, o2, *res, *cond);	break;
+		case INSTR_TST:	test = tst(o1, o2, *res, *cond);	break;
+		case INSTR_TEQ:	test = teq(o1, o2, *res, *cond);	break;
+		case INSTR_CMP:	test = cmp(o1, o2, *res, *cond);	break;
+		case INSTR_CMN:	test = cmn(o1, o2, *res, *cond);	break;
+		case INSTR_ORR:	test = orr(o1, o2, *res, *cond);	break;
+		case INSTR_MOV:	test = mov(o1, o2, *res, *cond);	break;
+		case INSTR_BIC:	test = bic(o1, o2, *res, *cond);	break;
+		case INSTR_MVN:	test = mvn(o1, o2, *res, *cond);	break;
 		default return UNDEFINED_INSTRUCTION;
 	}
 	if (test == -1)	return UNDEFINED_INSTRUCTION;	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% a faire
-	arm_write_register(p, rd, res);
-	if (S)	writeCondition(p, cond);
+	arm_write_register(p, rd, (uint32_t)res);
+	if (S)	writeCondition(p, res);
 	return 0; 			//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% a faire
-
 }
 
 int arm_data_processing_immediate_msr(arm_core p, uint32_t ins) {
