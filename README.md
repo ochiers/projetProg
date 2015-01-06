@@ -7,7 +7,7 @@ Projet de S5. PROG - ALM
 Listes des commandes d'installation
 
 Dans le dossier cible :
-git init
+git init \n
 git clone <url>
 
 Pour récupérer la version en ligne :
