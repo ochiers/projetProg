@@ -26,6 +26,31 @@ Contact: Guillaume.Huard@imag.fr
 #include "util.h"
 #include "debug.h"
 
+uint32_t scaledRegisterSwitch(arm_core p, uint8_t shift, uint8_t shift_imm, uint32_t addressRn, uint32_t contentRm) {
+	uint32_t index;
+	switch (shift) {
+		case 0 : /* LSL */
+			index = contentRm << shift_imm;
+			break;
+		case 1 : /* LSR */
+			(shift_imm == 0) ? index = 0 : index = addressRn >> shift_imm;
+			break;
+		case 2 : /* ASR */
+			if (shift_imm == 0) {
+				if (get_bit(contentRm, 31))
+					index = 0xFFFFFFFF;
+			}
+			else
+				index = asr(contentRm, shift_imm);
+			break;
+		case 3 : 
+			/* ROR or RRX */ 		/* RRX */ 												/* ROR */
+			(shift_imm == 0) ? index = (get_bit(p->cpsr, C) << 31) || (contentRm >> 1) : index = ror(contentRm, shift_imm);
+			break;
+	}
+	return index;
+}
+
 int arm_load_store(arm_core p, uint32_t ins) {
 
 	uint8_t cond = get_bits(ins, 32, 28);
@@ -43,17 +68,63 @@ int arm_load_store(arm_core p, uint32_t ins) {
 	uint8_t shift = get_bits(ins, 7, 5);
 	uint8_t Rm = get_bits(ins, 4, 0);
 	
+	uint32_t address;
+	uint32_t index;
 	uint32_t offset12 = get_bits(ins, 12, 0);
-	
-	uint32_t address = 0;
 	uint32_t addressRn = arm_read_register(p, Rn);	// Adresse de base, contenue dans Rn
+	uint32_t contentRd = arm_read_register(p, Rd);
 	uint32_t contentRm = arm_read_register(p, Rm);	// Offset contenu dans le registre Rm 
 	
-	if(L) { // Load
+	uint8_t *value;
+	
+	if(Rn != 15 && Rm !=15 && Rn != Rm) {
+	
+		if (!I && P) {
+			(U) ? address = addressRn + offset12 : adress = addressRm - offset12;
 		
+			if (W)
+				arm_write_register(p, Rn, address);
+		}
+		else if (I && P && shifter == 0) {
+			(U) ? address = addressRn + contentRm : address = addressRn - contentRm;
+			
+			if (W)
+				arm_write_register(p, Rn, address);                                 
+		}
+		else if (I && P) {
+		
+			index = scaledRegisterSwitch(p, shift, shift_imm, addressRn, contentRm);
+			
+			(U) ? address = addressRn + index : address = addressRn - index;
+			
+			if (W)
+				arm_write_register(p, Rn, address);
+		}
+		else if (I && !P && !W && shifter == 0) {
+			address = addressRn;
+			(U) ? arm_write_register(p, Rn, addressRn + contentRm) : arm_write_register(p, Rn, addressRn - contentRm);
+		}
+		else if (I && !P && !W) {
+			address = addressRn;
+			
+			index = scaledRegisterSwitch(p, shift, shift_imm, addressRn, contentRm);
+			
+			(U) ? arm_write_register(p, Rn, addressRn + index) : arm_write_register(p, Rn, addressRn - index);
+		}
+		else if (!I && !P && !W) {
+			address = addressRn;
+			
+			(U) ? arm_write_register(p, Rn, addressRn + offset12) : arm_write_register(p, Rn, addressRn - offset12);	
+		}
+		else return UNDEFINED_INSTRUCTION;
+	}
+	
+	if(L) { // Load
+		(B) ? arm_read_byte(p, address, &value) : arm_read_word(p, address, &value);
+		arm_write_register(p, Rd, *value);
 	}
 	else { // Store
-		
+		(B) ? arm_write_byte(p, address, (uint8_t) contentRd) : arm_write_word(p, address, contentRd) ;
 	}
 	
     return UNDEFINED_INSTRUCTION;
