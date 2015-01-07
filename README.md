@@ -18,7 +18,7 @@ Pour pousser la version locale en ligne :
 ==========
 
 Listes des commandes d'installation
-
+  
   Dans le dossier cible :
   - git init
   - git clone url
