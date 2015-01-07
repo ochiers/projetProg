@@ -41,10 +41,13 @@ int arm_load_store(arm_core p, uint32_t ins) {
 	uint8_t shifter = get_bits(ins, 12, 4);
 	uint8_t shift_imm = get_bits(ins, 12, 7);
 	uint8_t shift = get_bits(ins, 7, 5);
-	
 	uint8_t Rm = get_bits(ins, 4, 0);
 	
-	uint32_t address = arm_read_register(p, Rn); // Contenu de Rn
+	uint32_t offset12 = get_bits(ins, 12, 0);
+	
+	uint32_t address = 0;
+	uint32_t addressRn = arm_read_register(p, Rn);	// Adresse de base, contenue dans Rn
+	uint32_t contentRm = arm_read_register(p, Rm);	// Offset contenu dans le registre Rm 
 	
 	if(L) { // Load
 		

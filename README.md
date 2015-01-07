@@ -7,19 +7,17 @@ Projet de S5. PROG - ALM
 Listes des commandes d'installation
 
 Dans le dossier cible :
-git init \n
-git clone <url>
+git init
+git clone url
 
 Pour récupérer la version en ligne :
 git pull
 
 Pour pousser la version locale en ligne :
-git add <nomFichier1> <nomFichier2>
-git commit -m "Commentaire"
+git add nomFichier1 nomFichier2
+git pull
+git commit -m "Votre Commentaire"
 git push
-
-S'il y a un conflit lors du push, faire un pull
-! Attention à vos modifications, elles peuvent disparaître !
 
 Concernant la configuration :
 git config --list //Permet de voir la config. courante
