@@ -19,6 +19,13 @@ ENSIMAG - Laboratoire LIG
 */
 
 #define PC_USER 15
+
+#define PROCESSING 1 
+#define	LOAD_STORE 2
+#define	BRANCH_AUTRES 3 
+#define	NON_ENCORE_TRAITE 4
+#define	ERREUR 0
+
 #include "arm_instruction.h"
 #include "arm_exception.h"
 #include "arm_data_processing.h"
@@ -87,50 +94,93 @@ int evaluer_condition(arm_core p, uint32_t instruction){
 }
 
 
-/* Retourne 	1 pour processim
-   				2 pour load/store
-   				3 pour branch
-   				0 Si il y a une erreur */
+/* Retourne
+PROCESSING 1
+LOAD_STORE 2
+BRANCH_AUTRES 3 
+NON_ENCORE_TRAITE 4
+ERREUR 0*/
 int evaluer_categorie(arm_core p, uint32_t instruction) {
 
-	int categorie;
+	int categorie = 0;
 	
 	// On recupere les 3 bits apres les 4 bits de cond
 	uint32_t champ_categorie;
 	champ_categorie = instruction >> 25;
 	champ_categorie &= 0x7;
 	
-	// On récupere le bit 4 et le bit 7
-	uint32_t bit7, bit4;
+	// On récupere le bit4, 7, 20, 21, 22, 23, 24
+	uint32_t bit4, bit5, bit6, bit7, bit20, bit21, bit23, bit24;
 	bit4 = get_bit(instruction, 4);
+	bit5 = get_bit(instruction, 5);
+	bit6 = get_bit(instruction, 6);	
 	bit7 = get_bit(instruction, 7);
+	bit20 = get_bit(instruction, 20);
+	bit21 = get_bit(instruction, 21);
+	bit23 = get_bit(instruction, 23);
+	bit24 = get_bit(instruction, 24);
 	
 	switch(champ_categorie) {
 		case 000:
-			if ((!bit4) || (!bit7 && bit4)) categorie = 1;	break; 
+			if (bit24 && !bit23 && !bit20 && !bit4) {
+				categorie = BRANCH_AUTRES;
+			}
+			else if (bit24 && !bit23 && !bit20 && !bit7 && bit4) {
+				categorie = BRANCH_AUTRES;
+			}
+			else if (bit7 && !bit6 && !bit5 && bit4) { //Multiplies
+				categorie = PROCESSING;
+			}
+			else if (bit7 && !(!bit6 && !bit5) && bit4) { //Extra load/store
+				categorie = LOAD_STORE;
+			}
+			else if (!bit4 || (bit4 && !bit7)) {
+				categorie = PROCESSING;
+			}
+			break; 
 		case 001:
-			categorie = 1;									break; 
+			if (bit24 && !bit23 && !bit21 && !bit20) {
+				categorie = ERREUR;				
+			}
+			else {
+				categorie = PROCESSING;
+			}
+			break; 
 		case 010:
-			categorie = 2;									break; 
+			categorie = LOAD_STORE;	
+			break; 
 		case 011:
-			if (!bit4) categorie = 2;
-			else categorie = 0;								break; 
+			if (!bit4) {
+				categorie = LOAD_STORE;
+			}
+			else {
+				categorie = NON_ENCORE_TRAITE; // Media instruction & Architectually undefined
+			}
+			break; 
 		case 100:
-			categorie = 2;									break; 
+			categorie = LOAD_STORE;
+			break; 
 		case 101:
-			categorie = 3;									break; 
+			categorie = BRANCH_AUTRES;
+			break; 
 		case 110:
-			categorie = 2;									break; 
-		case default:
-			categorie = 0;
-		}
-		
+			categorie = NON_ENCORE_TRAITE;
+			break; 
+	}
+	
+	
 	return categorie;	
 }
 
-static int arm_execute_instruction(arm_core p, uint32_t instruction) {
+static int arm_execute_instruction(arm_core p) {
 	
-	int condition, categorie;
+	int condition, categorie, resultat;
+	
+	uint32_t instruction;	
+	
+	resultat = arm_fetch(p, &instruction);
+	
+	if(!resultat) return 0;
 	
 	condition = evaluer_condition(p, instruction);
 	categorie = evaluer_categorie(p, instruction);
@@ -160,19 +210,15 @@ static int arm_execute_instruction(arm_core p, uint32_t instruction) {
 	return 1;
 }
 
-int arm_step(arm_core p, uint32_t instruction) {
+int arm_step(arm_core p) {
 
 	int result;
-		
-	if(!arm_fetch(p,&instruction)) return 0;
 	
 	result = arm_execute_instruction(p);
 	
-	if (result) arm_exception(p, result);
+	if (result) {
+		arm_exception(p, result);
+	}
 	
 	return result;
 }
-
-
-
-
