@@ -166,59 +166,47 @@ int evaluer_categorie(arm_core p, uint32_t instruction) {
 		case 110:
 			categorie = NON_ENCORE_TRAITE;
 			break; 
-	}
-	
-	
+	}	
 	return categorie;	
 }
 
 static int arm_execute_instruction(arm_core p) {
-	
-	int condition, categorie, resultat;
-	
+	int condition, categorie, resultat = 0;
 	uint32_t instruction;	
-	
 	resultat = arm_fetch(p, &instruction);
-	
 	if(!resultat) return 0;
-	
 	condition = evaluer_condition(p, instruction);
-	categorie = evaluer_categorie(p, instruction);
-			
-	switch (condition) {
-		case 1: //la condition est bonne
-			switch (categorie) {
-				case 1: //Processim
-					arm_data_processing_shift(p, instruction);	break;
-				case 2: //load/store
-																break;
-				case 3: //branch
-																break;
-				case 0: //erreur
-					return 0;									break;
-				default:
-					return 0;			
-			}														break;
-		case 2: //arm_miscellaneous
-			arm_miscellaneous(p, instruction);
-			///////////////////////////// return ?					break; 
-		case 0: //la condition est mauvaise
-			///////////////////////////// return ?					break;
-		default:	
-			return 0;
+	categorie = evaluer_categorie(p, instruction);	
+	
+	if (condition == 0xF) {
+		resultat = arm_miscellaneous(p, instruction);
 	}
-	return 1;
+	else {
+		switch (categorie) {
+			case 1: //Processim
+				resultat = arm_data_processing_shift(p, instruction);	
+				break;
+			case 2: //load/store
+				//resultat = 
+				break;
+			case 3: //branch
+				//resultat = 
+				break;
+			case 0: //erreur
+				resultat = 0;
+				break;
+			default:
+				resultat = 0;			
+		}
+	}
+	return resultat;
 }
 
 int arm_step(arm_core p) {
-
 	int result;
-	
 	result = arm_execute_instruction(p);
-	
 	if (result) {
 		arm_exception(p, result);
 	}
-	
 	return result;
 }
