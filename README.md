@@ -20,13 +20,13 @@ Pour pousser la version locale en ligne :
 Listes des commandes d'installation
 
   Dans le dossier cible :
-    - git init
-    - git clone url
+  - git init
+  - git clone url
 
   Concernant la configuration :
-    - git config --list //Permet de voir la config. courante
-    - git config --global user.name "VotreNomGitHub"
-    - git config --global user.email @-mail
+  - git config --list //Permet de voir la config. courante
+  - git config --global user.name "VotreNomGitHub"
+  - git config --global user.email @-mail
 
 Lors du premier push, il se peut qu'il y ait une erreur demandant une option de configuration concernant le "push.default"
 Et il propose une ligne de commande. Il faut l'executer avec l'option : push.default=simple
