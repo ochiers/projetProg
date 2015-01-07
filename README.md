@@ -14,7 +14,12 @@ Pour récupérer la version en ligne :
   - git pull
 
 Pour pousser la version locale en ligne :
-  - git add nomFichier1 nomFichier2  
+  - git status // Pour voir les fichiers modifiés sur votre dossier local par rapport à la version en ligne
+  - git add nomFichier1 nomFichier2  // que vous avez modifiés et pas les autres
+  - git status 
+// S'il reste des fichiers en rouge
+  -git checkout nomFichiersChanges
+
   - git pull
   - git commit -m "Votre Commentaire"
   - git push
