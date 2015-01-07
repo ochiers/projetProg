@@ -29,7 +29,8 @@ ENSIMAG - Laboratoire LIG
 
 /* Retourne 0 si la condition est mauvaise, 
    			1 lorsque la condition est bonne, 
-   			2 si on doit executer arm_miscellaneous (contenu dans arm_branch_other)*/
+   			2 si on doit executer arm_miscellaneous (contenu dans arm_branch_other)
+			3 si erreur (ne peut theoriquement pas arriver)*/
 int evaluer_condition(arm_core p, uint32_t instruction){
 
 	int flag_condition;
@@ -80,7 +81,7 @@ int evaluer_condition(arm_core p, uint32_t instruction){
 		case COND_ZZ:
 			flag_condition = 2;											break;
 		default:
-			flag_condition = 0;
+			flag_condition = 3;		//Impossible tout les mots appartiennent au codes
 	}
 	return flag_condition;
 }
@@ -95,16 +96,16 @@ int evaluer_categorie(arm_core p, uint32_t instruction) {
 	int categorie;
 	
 	// On recupere les 3 bits apres les 4 bits de cond
-	uint32_t condition_courante;
-	condition_courante = instruction >> 25;
-	condition_courante &= 0x7;
+	uint32_t champ_categorie;
+	champ_categorie = instruction >> 25;
+	champ_categorie &= 0x7;
 	
 	// On récupere le bit 4 et le bit 7
 	uint32_t bit7, bit4;
 	bit4 = get_bit(instruction, 4);
 	bit7 = get_bit(instruction, 7);
 	
-	switch(condition_courante) {
+	switch(champ_categorie) {
 		case 000:
 			if ((!bit4) || (!bit7 && bit4)) categorie = 1;	break; 
 		case 001:
