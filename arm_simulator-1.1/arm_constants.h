@@ -33,6 +33,8 @@ Contact: Guillaume.Huard@imag.fr
 #define UND 0x1b
 #define SYS 0x1f
 
+#define SUCCESS 0
+
 /* ARM Exceptions (by priority) */
 #define RESET                   1
 #define UNDEFINED_INSTRUCTION   2
@@ -41,6 +43,8 @@ Contact: Guillaume.Huard@imag.fr
 #define DATA_ABORT              5
 #define INTERRUPT               6
 #define FAST_INTERRUPT          7
+
+#define UNPREDICTABLE 8
 
 /* Some CPSR bits */
 #define N 31
@@ -105,7 +109,6 @@ Contact: Guillaume.Huard@imag.fr
 #define COND_LE	13	//1101
 #define COND_AL	14	//1110
 #define COND_ZZ	15	//1111
-
 
 char *arm_get_exception_name(unsigned char exception);
 char *arm_get_mode_name(uint8_t mode);

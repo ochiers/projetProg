@@ -132,7 +132,7 @@ int arm_load_store(arm_core p, uint32_t ins) {
 		(B) ? (arm_write_byte(p, address, (uint8_t) contentRd)) : (arm_write_word(p, address, contentRd)) ;
 	}
 	
-    return UNDEFINED_INSTRUCTION;
+    return SUCCESS;
 }
 
 int arm_load_store_multiple(arm_core p, uint32_t ins) {
