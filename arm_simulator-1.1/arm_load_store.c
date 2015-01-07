@@ -58,6 +58,8 @@ uint32_t scaledRegisterSwitch(arm_core p, uint8_t shift, uint8_t shift_imm, uint
 int arm_load_store(arm_core p, uint32_t ins) {
 
 //	uint8_t cond = get_bits(ins, 32, 28);
+
+	uint8_t M = get_bit(ins, 26);
 	uint8_t I = get_bit(ins, 25);	
 	uint8_t P = get_bit(ins, 24);
 	uint8_t U = get_bit(ins, 23);
@@ -82,7 +84,7 @@ int arm_load_store(arm_core p, uint32_t ins) {
 	uint8_t value8;
 	uint32_t value32;
 	
-	if(Rn != 15 && Rm !=15 && Rn != Rm) {
+	if(M && Rn != 15 && Rm !=15 && Rn != Rm) {
 	
 		if (!I && P) {
 			(U) ? (address = addressRn + offset12) : (address = contentRm - offset12);
@@ -122,16 +124,20 @@ int arm_load_store(arm_core p, uint32_t ins) {
 			(U) ? (arm_write_register(p, Rn, addressRn + offset12)) : (arm_write_register(p, Rn, addressRn - offset12));	
 		}
 		else return UNDEFINED_INSTRUCTION;
+		
+		if(L) { // Load
+			(B) ? (arm_read_byte(p, address, &value8)) : (arm_read_word(p, address, &value32));
+			(B) ? arm_write_register(p, Rd, value8) : arm_write_register(p, Rd, value32);
+		}
+		else { // Store
+			(B) ? (arm_write_byte(p, address, (uint8_t) contentRd)) : (arm_write_word(p, address, contentRd)) ;
+		}
 	}
-	
-	if(L) { // Load
-		(B) ? (arm_read_byte(p, address, &value8)) : (arm_read_word(p, address, &value32));
-		(B) ? arm_write_register(p, Rd, value8) : arm_write_register(p, Rd, value32);
+	else if (!M) { //Miscellaneous Loads / Store
+		
 	}
-	else { // Store
-		(B) ? (arm_write_byte(p, address, (uint8_t) contentRd)) : (arm_write_word(p, address, contentRd)) ;
-	}
-	
+	else return UNPREDICABLE;
+		
     return SUCCESS;
 }
 
