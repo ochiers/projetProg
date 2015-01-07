@@ -28,15 +28,23 @@ Contact: Guillaume.Huard@imag.fr
 
 int arm_load_store(arm_core p, uint32_t ins) {
 
-	int I = get_bit(ins, 25);	
-	int P = get_bit(ins, 24);
-	int U = get_bit(ins, 23);
-	int B = get_bit(ins, 22);
-	int W = get_bit(ins, 21);
-	int L = get_bit(ins, 20);
+	uint8_t cond = get_bits(ins, 32, 28);
+	uint8_t I = get_bit(ins, 25);	
+	uint8_t P = get_bit(ins, 24);
+	uint8_t U = get_bit(ins, 23);
+	uint8_t B = get_bit(ins, 22);
+	uint8_t W = get_bit(ins, 21);
+	uint8_t L = get_bit(ins, 20);
+	uint8_t Rn = get_bits(ins, 20, 16);
+	uint8_t Rd = get_bits(ins, 16, 12);
 	
-	uint32_t address; // Contenu de Rn 
-	int shift = get_bits(ins, 7, 5);
+	uint8_t shifter = get_bits(ins, 12, 4);
+	uint8_t shift_imm = get_bits(ins, 12, 7);
+	uint8_t shift = get_bits(ins, 7, 5);
+	
+	uint8_t Rm = get_bits(ins, 4, 0);
+	
+	uint32_t address = arm_read_register(p, Rn); // Contenu de Rn
 	
 	if(L) { // Load
 		
