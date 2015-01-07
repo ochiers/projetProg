@@ -68,23 +68,33 @@ int arm_load_store(arm_core p, uint32_t ins) {
 	uint8_t L = get_bit(ins, 20);
 	uint8_t Rn = get_bits(ins, 20, 16);
 	uint8_t Rd = get_bits(ins, 16, 12);
+	uint8_t Rm = get_bits(ins, 4, 0);
+	
+	uint32_t addressRn = arm_read_register(p, Rn);	// Adresse de base, contenue dans Rn
+	uint32_t contentRm = arm_read_register(p, Rm);	// Offset contenu dans le registre Rm
+	
+	/* Variables pour Load/Store simple */
 	
 	uint8_t shifter = get_bits(ins, 12, 4);
 	uint8_t shift_imm = get_bits(ins, 12, 7);
 	uint8_t shift = get_bits(ins, 7, 5);
-	uint8_t Rm = get_bits(ins, 4, 0);
 	
 	uint32_t address = 0;
 	uint32_t index;
 	uint32_t offset12 = get_bits(ins, 12, 0);
-	uint32_t addressRn = arm_read_register(p, Rn);	// Adresse de base, contenue dans Rn
 	uint32_t contentRd = arm_read_register(p, Rd);
-	uint32_t contentRm = arm_read_register(p, Rm);	// Offset contenu dans le registre Rm 
 	
 	uint8_t value8;
 	uint32_t value32;
 	
-	if(M && Rn != 15 && Rm !=15 && Rn != Rm) {
+	/* Variables pour Miscellaneous Load/Store */
+	
+	uint8_t immedH = get_bits(ins, 12, 8);
+	uint8_t immedL = get_bits(ins, 4, 0);
+	uint8_t offset8 = 0;
+	uint8_t SBZ = get_bits(ins, 12, 8);
+	
+	if(M && Rn != 15 && Rm !=15 && Rn != Rm) { // Load/Store simple
 	
 		if (!I && P) {
 			(U) ? (address = addressRn + offset12) : (address = contentRm - offset12);
@@ -133,10 +143,39 @@ int arm_load_store(arm_core p, uint32_t ins) {
 			(B) ? (arm_write_byte(p, address, (uint8_t) contentRd)) : (arm_write_word(p, address, contentRd)) ;
 		}
 	}
-	else if (!M) { //Miscellaneous Loads / Store
-		
+	else if (!M) { //Miscellaneous Load/Store
+		if(!I && P && B) {
+			if (Rn == 15) {
+				if (!W)
+					address += 8;
+				else 
+					return UNPREDICABLE;
+			}
+			offset8 = (immedH << 4) || immedL;
+			(U) ? address += addressRn + offset8 : address += addressRn - offset8 ;
+			
+		}
+		else if (!I && P && !B) {
+			if (Rm == 15 || (W && Rn == 15)) 
+				return UNPREDICABLE;
+			(U) ? address = addressRn + contentRm : address = addressRn - contentRm ;
+			
+		}
+		else if (!I && !P && B) {
+			if (Rn == 15)
+				return UNPREDICABLE;
+			address = addressRn;
+			offset8 = (immedH << 4) || immedL;
+			(U) ? (arm_write_register(p, Rn, addressRn + offset8)) : (arm_write_register(p, Rn, addressRn - offset8)) ;
+		}
+		else if (!I && !P && !B) {
+			if (Rn == Rm)
+				return UNPREDICABLE;
+			address = addressRn;
+			(U) ? (arm_write_register(p, Rn, addressRn + contentRm)) : (arm_write_register(p, Rn, addressRn - contentRm)) ;
+		}
 	}
-	else return UNPREDICABLE;
+	else return UNDEFINED_INSTRUCTION;
 		
     return SUCCESS;
 }
