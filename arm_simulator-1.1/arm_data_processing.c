@@ -40,7 +40,8 @@ Contact: Guillaume.Huard@imag.fr
 // ------------------------------------------
 char readOperand(arm_core p, uint32_t ins, uint64_t *o1, uint64_t *o2, uint8_t *rd, uint8_t *S, uint8_t *op)
 {
-	uint8_t irn, I;
+	uint8_t irn, I, rotate_imm;
+	uint32_t immed;
 
 	*rd	= (ins & 0x000F000) >> 12;				// Calcule numero registre dest
 	irn	= (ins & 0x00F0000) >> 16;				// Calcule numero registre src 1
@@ -48,8 +49,13 @@ char readOperand(arm_core p, uint32_t ins, uint64_t *o1, uint64_t *o2, uint8_t *
 	*op	= (ins & 0x1E00000) >> 21;				// Calcule le code operation
 	*o1	= (uint64_t)arm_read_register(p, irn);			// Calcule Operande 1
 
-	I = ins & 0x3000000;
-	if (I)	*o2 = rd;						// Calcule Operande 2		// *********************** A completer: voir p 442 et 443
+	I = (ins & 0x2000000) >> 25;					// Calcule Operande 2		// *********************** A completer: voir p 442 et 443
+	if (I)
+	{
+		immed		= (ins & 0x0FF);
+		rotate_imm	= (ins & 0xF00) >> 8;
+		
+	}
 	else
 	{
 		if ((rd < 0) || (rd > 15))	return -1;	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% a faire
@@ -126,7 +132,7 @@ int arm_data_processing_shift(arm_core p, uint32_t ins)
 	}
 	if (test == -1)	return UNDEFINED_INSTRUCTION;	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% a faire
 	arm_write_register(p, rd, (uint32_t)res);
-	if (S)	writeCondition(p, res);
+	if (S)	writeCondition(p, res);		// %%%%%%%%%%%%%%%%%%%%%% A corriger voir page 157
 	return 0; 			//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% a faire
 }
 
