@@ -25,6 +25,8 @@ Contact: Guillaume.Huard@imag.fr
 #include <stdint.h>
 #include "arm_core.h"
 
+uint32_t scaledRegisterSwitch(arm_core p, uint8_t shift, uint8_t shift_imm, uint32_t addressRn, uint32_t contentRm);
+
 int arm_load_store(arm_core p, uint32_t ins);
 int arm_load_store_multiple(arm_core p, uint32_t ins);
 int arm_coprocessor_load_store(arm_core p, uint32_t ins);
