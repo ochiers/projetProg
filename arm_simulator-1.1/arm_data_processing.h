@@ -12,6 +12,13 @@
 // Decoding functions for different classes of instructions
 // ------------------------------------------
 	int arm_data_processing_immediate_msr(arm_core p, uint32_t ins);
+// ------------------------------------------
+// Decoding functions for different classes of instructions
+// Execute la fonction
+// Met a jours le registre destination
+// Met a jour le registre d'etat cpsr en fonction du bit S et
+// de l'algo de la commande
+// ------------------------------------------
 	int arm_data_processing_shift(arm_core p, uint32_t ins);
 // ------------------------------------------
 // Lit les valeur des registres dans l'instruction
@@ -53,21 +60,5 @@
 //	- shifter_carry_out: voir doc p 446
 // ------------------------------------------
 	void readOperand1_regShift(arm_core p, uint32_t ins, uint32_t *o1, uint8_t *shifter_carry_out);
-// ------------------------------------------
-// Rend 1 si la soustraction a - b - c cree un emprint
-// ------------------------------------------
-	uint8_t borrowFrom(uint32_t a, uint32_t b, uint32_t c);
-// ------------------------------------------
-// Rend 1 si l'addition a + b + c cree un debordement
-// ------------------------------------------
-	uint8_t overflowFromAdd(uint32_t a, uint32_t b, uint32_t c);
-// ------------------------------------------
-// Rend 1 si la soustraction a + b + c cree un debordement
-// ------------------------------------------
-	uint8_t overflowFromSub(uint32_t a, uint32_t b, uint32_t c);
-// ------------------------------------------
-// Rend 1 si la soustraction a + b + c cree un debordement
-// ------------------------------------------
-	uint8_t carryFrom(uint32_t a, uint32_t b, uint32_t c);
 
 #endif

@@ -13,12 +13,16 @@
 
 
 
-int arm_data_processing_immediate_msr(arm_core p, uint32_t ins) {
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% a faire
+int arm_data_processing_immediate_msr(arm_core p, uint32_t ins)
+{
     return UNDEFINED_INSTRUCTION;
 }
 // ------------------------------------------
 // Decoding functions for different classes of instructions
+// Execute la fonction
+// Met a jours le registre destination
+// Met a jour le registre d'etat cpsr en fonction du bit S et
+// de l'algo de la commande
 // ------------------------------------------
 int arm_data_processing_shift(arm_core p, uint32_t ins)
 {
@@ -142,8 +146,9 @@ int arm_data_processing_shift(arm_core p, uint32_t ins)
 	{
 		if (rd == 15)									//	Cas d'un changement de pc
 		{
-			if (arm_current_mode_has_spsr(p)) arm_write_cpsr(p, arm_read_cpsr(p));	//		CPSR <- SPSR
-			else return UNPREDICTABLE;						//		Droit d'acces a CPSR refuse
+			if (arm_current_mode_has_spsr(p)) arm_write_cpsr(p, arm_read_spsr(p));	//		CPSR <- SPSR
+												//		else return UNPREDICTABLE;
+												//		Droit d'acces a CPSR refuse
 		}
 		else										//	Cas general (Les flags C, v sont mis a
 		{										//	jours par l'execution des instructions)
@@ -336,41 +341,4 @@ void readOperand1_regShift(arm_core p, uint32_t ins, uint32_t *o1, uint8_t *shif
 			}
 			break;
 	}
-}
-// ------------------------------------------
-// Rend 1 si la soustraction a - b - c cree un emprint
-// ------------------------------------------
-uint8_t borrowFrom(uint32_t a, uint32_t b, uint32_t c)
-{
-	if (c > b)	return 0;
-	uint32_t x = b - c;
-	if (x > a)	return 1;
-	else		return 0;
-}
-// ------------------------------------------
-// Rend 1 si l'addition a + b + c cree un debordement
-// ------------------------------------------
-uint8_t overflowFromAdd(uint32_t a, uint32_t b, uint32_t c)
-{
-	uint64_t res = (uint64_t)a + (uint64_t)b + (uint64_t)c;
-
-	return (get_bit(res, 32) == 1);
-}
-// ------------------------------------------
-// Rend 1 si la soustraction a + b + c cree un debordement
-// ------------------------------------------
-uint8_t overflowFromSub(uint32_t a, uint32_t b, uint32_t c)
-{
-	uint64_t res = (uint64_t)a - (uint64_t)b - (uint64_t)c;
-
-	return (get_bit(res, 32) == 1);
-}
-// ------------------------------------------
-// Rend 1 si la soustraction a + b + c cree un debordement
-// ------------------------------------------
-uint8_t carryFrom(uint32_t a, uint32_t b, uint32_t c)
-{
-	uint64_t res = (uint64_t)a + (uint64_t)b + (uint64_t)c;
-
-	return (res > 0xFFFFFFFF);
 }

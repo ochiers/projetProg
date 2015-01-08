@@ -67,6 +67,22 @@ uint32_t ror(uint32_t value, uint8_t rotation);
 //	- res:	resultat du calcul sur 32 bits
 // ------------------------------------------
 	uint32_t lsr(uint32_t a, uint8_t shift);
+// ------------------------------------------
+// Rend 1 si la soustraction a - b - c cree un emprunt
+// ------------------------------------------
+	uint8_t borrowFrom(uint32_t a, uint32_t b, uint32_t c);
+// ------------------------------------------
+// Rend 1 si l'addition a + b + c cree un debordement
+// ------------------------------------------
+	uint8_t overflowFromAdd(uint32_t a, uint32_t b, uint32_t c);
+// ------------------------------------------
+// Rend 1 si la soustraction a + b + c cree un debordement
+// ------------------------------------------
+	uint8_t overflowFromSub(uint32_t a, uint32_t b, uint32_t c);
+// ------------------------------------------
+// Rend 1 si la soustraction a + b + c cree un debordement
+// ------------------------------------------
+	uint8_t carryFrom(uint32_t a, uint32_t b, uint32_t c);
 
 int is_big_endian();
 #endif

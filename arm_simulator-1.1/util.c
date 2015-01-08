@@ -74,3 +74,40 @@ uint32_t lsr(uint32_t a, uint8_t shift)
 {
 	return (a >> shift);
 }
+// ------------------------------------------
+// Rend 1 si la soustraction a - b - c cree un emprunt
+// ------------------------------------------
+uint8_t borrowFrom(uint32_t a, uint32_t b, uint32_t c)
+{
+	if (c > b)	return 0;
+	uint32_t x = b - c;
+	if (x > a)	return 1;
+	else		return 0;
+}
+// ------------------------------------------
+// Rend 1 si l'addition a + b + c cree un debordement
+// ------------------------------------------
+uint8_t overflowFromAdd(uint32_t a, uint32_t b, uint32_t c)
+{
+	uint64_t res = (uint64_t)a + (uint64_t)b + (uint64_t)c;
+
+	return (get_bit(res, 32) == 1);
+}
+// ------------------------------------------
+// Rend 1 si la soustraction a + b + c cree un debordement
+// ------------------------------------------
+uint8_t overflowFromSub(uint32_t a, uint32_t b, uint32_t c)
+{
+	uint64_t res = (uint64_t)a - (uint64_t)b - (uint64_t)c;
+
+	return (get_bit(res, 32) == 1);
+}
+// ------------------------------------------
+// Rend 1 si la soustraction a + b + c cree un debordement
+// ------------------------------------------
+uint8_t carryFrom(uint32_t a, uint32_t b, uint32_t c)
+{
+	uint64_t res = (uint64_t)a + (uint64_t)b + (uint64_t)c;
+
+	return (res > 0xFFFFFFFF);
+}

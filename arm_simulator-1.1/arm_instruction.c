@@ -183,7 +183,7 @@ static int arm_execute_instruction(arm_core p) {
 	}
 	else {
 		switch (categorie) {
-			case 1: //Processim
+			case 1: //Processig
 				resultat = arm_data_processing_shift(p, instruction);	
 				break;
 			case 2: //load/store

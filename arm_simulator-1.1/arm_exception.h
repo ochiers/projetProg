@@ -23,6 +23,8 @@ Contact: Guillaume.Huard@imag.fr
 #ifndef __ARM_EXCEPTION_H__
 #define __ARM_EXCEPTION_H__
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "arm_core.h"
 
 void arm_exception(arm_core p, unsigned char exception);
