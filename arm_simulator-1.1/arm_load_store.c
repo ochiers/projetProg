@@ -200,6 +200,27 @@ int arm_load_store(arm_core p, uint32_t ins) {
 	}
 	else return UNDEFINED_INSTRUCTION;
 	
+	
+	if (I && !B && L) { /* LDR */
+		
+	}
+	else if (I && B && L) { /* LDRB */
+	
+	}
+	else if (!I && L) { /* LDRH */
+	
+	}
+	else if (I && !B && !L) { /* STR */
+	
+	}
+	else if (I && B && !L) { /* STRB */
+	
+	}
+	else if (!I && !L) { /* STRH */
+	
+	}
+	
+	
     return result;
 }
 
