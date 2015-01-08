@@ -45,10 +45,29 @@ Contact: Guillaume.Huard@imag.fr
 #define FAST_INTERRUPT          7
 
 /* Some CPSR bits */
-#define N 31
-#define Z 30
-#define C 29
-#define V 28
+#define CPSR_N 31
+#define CPSR_Z 30
+#define CPSR_C 29
+#define CPSR_V 28
+
+#define CPSR_J 24
+
+#define CPSR_GE[3] 19
+#define CPSR_GE[2] 18
+#define CPSR_GE[1] 17
+#define CPSR_GE[0] 16
+#define CPSR_E 9
+#define CPSR_A 8
+#define CPSR_I 7
+#define CPSR_F 6
+#define CPSR_T 5
+#define CPSR_M[4] 16
+#define CPSR_M[3] 16
+#define CPSR_M[2] 16
+#define CPSR_M[1] 16
+#define CPSR_M[0] 16
+
+
 
 /* shift operations */
 #define LSL 0
