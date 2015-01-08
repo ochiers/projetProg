@@ -21,6 +21,8 @@
 #include "arm_branch_other.h"
 #include "arm_constants.h"
 #include "util.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 /* Retourne 0 si la condition est mauvaise, 
@@ -210,13 +212,14 @@ int sous_categorie_processing(uint32_t instruction) {
 static int arm_execute_instruction(arm_core p) {
 	int condition, resultat = 1, type, categorie;
 	uint32_t instruction;
-	uint32_t CPSR;	
+	uint32_t cpsr;	
 	resultat = arm_fetch(p, &instruction);
 	if(!resultat) {
 		printf("erreur de fetch. %d\n", resultat);
 		return 0;
 	}
-	printf("instruction %b\n", instruction);
+	printf("instruction : ");
+	printBin(instruction, 32);
 	condition = evaluer_condition(p, instruction);
 	categorie = evaluer_categorie(p, instruction);
     
@@ -274,17 +277,18 @@ static int arm_execute_instruction(arm_core p) {
 		resultat = arm_miscellaneous(p, instruction);
 		printf("arm_miscellaneous\n");
 	}
-	CPSR = arm_read_cpsr(p);
-	printf("mode\t%4b\n", CPSR & 0xF);
-	/*printf("T\t\n", (CPSR >> 5) & 0x1);
-	printf("F\t\n", (CPSR >> 6) & 0x1);
-	printf("I\t\n", (CPSR >> 7) & 0x1);
-	printf("A\t\n", (CPSR >> 8) & 0x1);
-	printf("E\t\n", (CPSR >> 9) & 0x1);
-	printf("GE\t\n", (CPSR >> 10) & 0x7);
-	printf("J\t\n", (CPSR >> 11) & 0x1); */
-	printf("NZCV\t%4b\n", (CPSR >> 28));
-	
+	cpsr = arm_read_cpsr(p);
+	printf("mode : ");
+	printBin((cpsr & 0xF), 4);
+	/*printf("T\t\n", (cpsr >> 5) & 0x1);
+	printf("F\t\n", (cpsr >> 6) & 0x1);
+	printf("I\t\n", (cpsr >> 7) & 0x1);
+	printf("A\t\n", (cpsr >> 8) & 0x1);
+	printf("E\t\n", (cpsr >> 9) & 0x1);
+	printf("GE\t\n", (cpsr >> 10) & 0x7);
+	printf("J\t\n", (cpsr >> 11) & 0x1); */
+	printf("NZCV : ");
+	printBin((cpsr >> 28), 4);	
 	return resultat;
 }
 ////////////////////////////////////////////////////////////////////////////////
