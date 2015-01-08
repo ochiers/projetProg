@@ -55,7 +55,7 @@ uint32_t scaledRegisterSwitch(arm_core p, uint8_t shift, uint8_t shift_imm, uint
 
 int arm_load_store(arm_core p, uint32_t ins) {
 
-//	uint8_t cond = get_bits(ins, 32, 28);
+	int result = 0;
 
 	uint8_t M = get_bit(ins, 26);
 	uint8_t I = get_bit(ins, 25);	
@@ -92,11 +92,8 @@ int arm_load_store(arm_core p, uint32_t ins) {
 	uint8_t immedH = get_bits(ins, 12, 8);
 	uint8_t immedL = get_bits(ins, 4, 0);
 	uint8_t offset8 = 0;
-	uint8_t SBZ = get_bits(ins, 12, 8);
 	
 	uint16_t value16;
-	int8_t signedValue8;
-	int16_t signedValue16;
 	
 	if(M && Rn != 15 && Rm !=15 && Rn != Rm) { // Load/Store simple
 	
@@ -141,11 +138,11 @@ int arm_load_store(arm_core p, uint32_t ins) {
 		
 		if(L) { // Load
 			if (B) {
-				arm_read_byte(p, address, &value8);
+				result = arm_read_byte(p, address, &value8);
 				arm_write_register(p, Rd, value8);
 			}
 			else {
-				arm_read_word(p, address, &value32);
+				result = arm_read_word(p, address, &value32);
 				arm_write_register(p, Rd, value32);
 			}
 		}
@@ -161,11 +158,11 @@ int arm_load_store(arm_core p, uint32_t ins) {
 					address += 8;
 			}
 			offset8 = (immedH << 4) || immedL;
-			(U) ? address += addressRn + offset8 : address += addressRn - offset8 ;
+			(U) ? (address += (addressRn + offset8)) : (address += (addressRn - offset8));
 			
 		}
 		else if (!I && P && !B && !(Rm == 15 || (W && Rn == 15))) {
-			(U) ? address = addressRn + contentRm : address = addressRn - contentRm ;
+			(U) ? (address = (addressRn + contentRm)) : (address = (addressRn - contentRm));
 			
 		}
 		else if (!I && !P && B && Rn != 15) {
@@ -179,34 +176,36 @@ int arm_load_store(arm_core p, uint32_t ins) {
 		}
 		
 		if (!L && !S && H) { /* Store Halfword */
-			arm_write_half(p, address, (uint16_t) contentRd);
+			result = arm_write_half(p, address, (uint16_t) contentRd);
 		}
 		else if (!L && S && !H) { /* Load Doubleword */
-			arm_read_word(p, address, &value32);
+			result = arm_read_word(p, address, &value32);
 			arm_write_register(p, Rd, value32);
 		}
 		else if (!L && S && H) { /* Store Doubleword */
-			arm_write_word(p, address, contentRd);
+			result = arm_write_word(p, address, contentRd);
 		}
 		else if (L && !S && H) { /* Load Unsigned Halfword */
-			arm_read_half(p, address, &value16);
+			result = arm_read_half(p, address, &value16);
 			arm_write_register(p, Rd, value16);
 		}
 		else if (L && S && H) { /* Load signed Byte */
-			arm_read_byte(p, address, &signedValue8);
-			arm_write_register(p, Rd, signedValue8);
+			result = arm_read_byte(p, address, &value8);
+			arm_write_register(p, Rd, value8);
 		}
 		else if (L && S && H) { /* Load signed Halfword */
-			arm_read_half(p, address, &signedValue16);
-			arm_write_register(p, Rd, signedValue16);
+			result = arm_read_half(p, address, &value16);
+			arm_write_register(p, Rd, value16);
 		}
 	}
 	else return UNDEFINED_INSTRUCTION;
 	
-    return SUCCESS;
+    return result;
 }
 
 int arm_load_store_multiple(arm_core p, uint32_t ins) {
+	
+	int result = 0;
 	
 	uint8_t before = get_bit(ins, 24);
 	uint8_t increment = get_bit(ins, 23);
@@ -214,8 +213,7 @@ int arm_load_store_multiple(arm_core p, uint32_t ins) {
 	uint8_t W = get_bit(ins, 21);
 	uint8_t L = get_bit(ins, 20);
 	
-	uint8_t Rn = get_bits(ins, 20, 16);
-	uint16_t registerList = get_bits(ins, 16, 0);	
+	uint8_t Rn = get_bits(ins, 20, 16);	
 	
 	uint32_t startAddress = 0;
 	uint32_t endAddress = 0;
@@ -223,6 +221,8 @@ int arm_load_store_multiple(arm_core p, uint32_t ins) {
 	
 	uint8_t numberOfRegister = 0;
 	uint8_t listOfRegister[16];
+	
+	uint32_t value32;
 	
 	int i = 0;
 	for(i = 0; i < 16; i++) {
@@ -260,7 +260,7 @@ int arm_load_store_multiple(arm_core p, uint32_t ins) {
 			while (!listOfRegister[i] && i < 16) {
 				i++;
 			}
-			arm_read_word(p, startAddress, &value32);
+			result = arm_read_word(p, startAddress, &value32);
 			arm_write_register(p, i, value32);
 			startAddress += 4;
 			numberOfRegister--;
@@ -272,13 +272,13 @@ int arm_load_store_multiple(arm_core p, uint32_t ins) {
 			while (!listOfRegister[i] && i < 16) {
 				i++;
 			}
-			arm_write_word(p, startAddress, arm_read_register(p, i));
+			result = arm_write_word(p, startAddress, arm_read_register(p, i));
 			startAddress += 4;
 			numberOfRegister--;
 		}
 	}
 	
-    return SUCCESS;
+    return result;
 }
 
 int arm_coprocessor_load_store(arm_core p, uint32_t ins) {
