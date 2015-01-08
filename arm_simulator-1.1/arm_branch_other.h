@@ -34,6 +34,6 @@ int arm_branch_X(arm_core p, uint32_t ins);
 int arm_coprocessor_others_swi(arm_core p, uint32_t ins);
 int arm_miscellaneous(arm_core p, uint32_t ins);
 
-uint32_t lecture_entier_immediat_signe_24bits(uint32_t instruction)
+uint32_t lecture_entier_immediat_signe_24bits(uint32_t instruction);
 
 #endif
