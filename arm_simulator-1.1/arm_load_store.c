@@ -29,7 +29,7 @@ Contact: Guillaume.Huard@imag.fr
 uint32_t scaledRegisterSwitch(arm_core p, uint8_t shift, uint8_t shift_imm, uint32_t addressRn, uint32_t contentRm) {
 	uint32_t index = 0;
 	uint32_t cpsr = arm_read_cpsr(p);
-	uint8_t bitC = get_bit(cpsr, C);
+	uint8_t bitC = get_bit(cpsr, CPSR_C);
 	switch (shift) {
 		case 0 : /* LSL */
 			index = contentRm << shift_imm;
@@ -137,6 +137,7 @@ int arm_load_store(arm_core p, uint32_t ins) {
 		else return UNDEFINED_INSTRUCTION;
 		
 		if(L) { // Load
+		printf("Load\n");
 			if (B) {
 				result = arm_read_byte(p, address, &value8);
 				arm_write_register(p, Rd, value8);
@@ -147,6 +148,7 @@ int arm_load_store(arm_core p, uint32_t ins) {
 			}
 		}
 		else { // Store
+		printf("Store\n");
 			(B) ? (arm_write_byte(p, address, (uint8_t) contentRd)) : (arm_write_word(p, address, contentRd)) ;
 		}
 		
