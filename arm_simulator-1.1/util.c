@@ -118,6 +118,6 @@ void printBin(uint32_t a, uint8_t nbrBit)
 {
 	uint8_t i;
 
-	for (i=0; i<nbrBit; i++)	printf("%d", get_bit(a, i));
+	for (i=nbrBit; i>0; i--)	printf("%d", get_bit(a, i-1));
 	printf("\n");
 }
