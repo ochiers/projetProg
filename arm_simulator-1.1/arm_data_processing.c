@@ -28,11 +28,12 @@ int arm_data_processing_shift(arm_core p, uint32_t ins)
 {
 	uint32_t res=0, o0, o1;
 	uint32_t cpsr = arm_read_cpsr(p);
-	uint8_t rd, S, op, shifter_carry_out;
+	uint8_t rd, rn, S, op, shifter_carry_out;
 	uint8_t cflag = (get_bit(cpsr, CPSR_C) >> CPSR_C);
 	uint8_t ncflag = ((~cflag) & 0x1);
 
-	readOperand(p, ins, &o0, &o1, &shifter_carry_out, &rd, &S, &op);			// Parser l'instruction
+	readOperand(p, ins, &o0, &o1, &shifter_carry_out, &rn, &rd, &S, &op);			// Parser l'instruction
+	printInstrdataProcessingShift(op, S, rn, rd, o0, o1);
 	switch(op)										// Executer l'instruction
 	{
 		case INSTR_AND:	res = o0 & o1;
@@ -170,20 +171,21 @@ int arm_data_processing_shift(arm_core p, uint32_t ins)
 // Parametre de sortie:
 //	- o0, o1:		Valeur des operandes 0 et 1
 //	- shifter_carry_out:	retenue sortante de l'opperande o1
+//	- irn:			numero du registre operande 0
 //	- rd:			numero du registre destination
 //	- S: 			indique si les codes conditions doivent etre mis a jours
 //	- op:			code de l'operation a realiser
 // ------------------------------------------
-void readOperand(arm_core p, uint32_t ins, uint32_t *o0, uint32_t *o1, uint8_t *shifter_carry_out, uint8_t *rd, uint8_t *S, uint8_t *op)
+void readOperand(arm_core p, uint32_t ins, uint32_t *o0, uint32_t *o1, uint8_t *shifter_carry_out, uint8_t *irn, uint8_t *rd, uint8_t *S, uint8_t *op)
 {
-	uint8_t irn, irm, I, rotate_imm;
+	uint8_t irm, I, rotate_imm;
 	uint32_t immed;
 
 	*rd	= (ins & 0x000F000) >> 12;							// Calcule numero registre dest
-	irn	= (ins & 0x00F0000) >> 16;							// Calcule numero registre src 0
+	*irn	= (ins & 0x00F0000) >> 16;							// Calcule numero registre src 0
 	*S	= (ins & 0x0100000) >> 20;							// Calcule le bit S
 	*op	= (ins & 0x1E00000) >> 21;							// Calcule le code operation
-	*o0	= arm_read_register(p, irn);							// Calcule Operande 0
+	*o0	= arm_read_register(p, *irn);							// Calcule Operande 0
 
 	I = (ins & 0x2000000) >> 25;								// Calcule Operande 1
 	if (I)											//	Cas d'un immediat
@@ -201,6 +203,18 @@ void readOperand(arm_core p, uint32_t ins, uint32_t *o0, uint32_t *o1, uint8_t *
 		if (get_bit(ins, 4))	readOperand1_regShift(p, ins, o1, shifter_carry_out);	//		Cas d'un shift lu dans un registre
 		else			readOperand1_immShift(p, ins, o1, shifter_carry_out);	//		Cas d'un shift lu dans un immediat
 	}
+}
+// ------------------------------------------
+// Affiche les differantes valeurs de l'instruction
+// ------------------------------------------
+void printInstrdataProcessingShift(uint8_t op, uint8_t S, uint8_t rn, uint8_t rd, uint32_t o0, uint32_t o1)
+{
+	printf("\t- opcode\t: ");	printBin(op, 4);
+	printf("\t- S\t\t: ");		printBin(S,  1);
+	printf("\t- Rn\t\t: %d\n", rn);
+	printf("\t- Rd\t\t: %d\n", rd);
+	printf("\t- Valeur o0:\t: %d\n", o0);
+	printf("\t- Valeur o1:\t: %d\n", o1);
 }
 // ------------------------------------------
 // Lit la valeur de l'opperande 1 et du shifter_carry dans le
