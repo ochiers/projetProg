@@ -29,114 +29,114 @@ int arm_data_processing_shift(arm_core p, uint32_t ins)
 	uint32_t res=0, o0, o1;
 	uint32_t cpsr = arm_read_cpsr(p);
 	uint8_t rd, S, op, shifter_carry_out;
-	uint8_t cflag = (get_bit(cpsr, C) >> C);
+	uint8_t cflag = (get_bit(cpsr, CPSR_C) >> CPSR_C);
 	uint8_t ncflag = ((~cflag) & 0x1);
 
 	readOperand(p, ins, &o0, &o1, &shifter_carry_out, &rd, &S, &op);			// Parser l'instruction
 	switch(op)										// Executer l'instruction
 	{
 		case INSTR_AND:	res = o0 & o1;
-				if (shifter_carry_out)		cpsr = set_bit(cpsr, C);
-				else				cpsr = clr_bit(cpsr, C);
+				if (shifter_carry_out)		cpsr = set_bit(cpsr, CPSR_C);
+				else				cpsr = clr_bit(cpsr, CPSR_C);
 				break;
 		case INSTR_EOR:	res = eor(o0, o1);
-				if (shifter_carry_out)		cpsr = set_bit(cpsr, C);
-				else				cpsr = clr_bit(cpsr, C);
+				if (shifter_carry_out)		cpsr = set_bit(cpsr, CPSR_C);
+				else				cpsr = clr_bit(cpsr, CPSR_C);
 				break;
 		case INSTR_SUB:	res = o0 - o1;
-				if (borrowFrom(o0, o1, 0))	cpsr = clr_bit(cpsr, C);
-				else				cpsr = set_bit(cpsr, C);
-				if (overflowFromSub(o0, o1, 0))	cpsr = set_bit(cpsr, V);
-				else				cpsr = set_bit(cpsr, V);
+				if (borrowFrom(o0, o1, 0))	cpsr = clr_bit(cpsr, CPSR_C);
+				else				cpsr = set_bit(cpsr, CPSR_C);
+				if (overflowFromSub(o0, o1, 0))	cpsr = set_bit(cpsr, CPSR_V);
+				else				cpsr = set_bit(cpsr, CPSR_V);
 				break;
 		case INSTR_RSB:	res = o1 - o0;
-				if (borrowFrom(o1, o0, 0))	cpsr = clr_bit(cpsr, C);
-				else				cpsr = set_bit(cpsr, C);
-				if (overflowFromSub(o1, o0, 0))	cpsr = set_bit(cpsr, V);
-				else				cpsr = set_bit(cpsr, V);
+				if (borrowFrom(o1, o0, 0))	cpsr = clr_bit(cpsr, CPSR_C);
+				else				cpsr = set_bit(cpsr, CPSR_C);
+				if (overflowFromSub(o1, o0, 0))	cpsr = set_bit(cpsr, CPSR_V);
+				else				cpsr = set_bit(cpsr, CPSR_V);
 				break;
 		case INSTR_ADD:	res = o0 + o1;
-				if (carryFrom(o0, o1, 0))	cpsr = clr_bit(cpsr, C);
-				else				cpsr = set_bit(cpsr, C);
-				if (overflowFromAdd(o0, o1, 0))	cpsr = set_bit(cpsr, V);
-				else				cpsr = set_bit(cpsr, V);
+				if (carryFrom(o0, o1, 0))	cpsr = clr_bit(cpsr, CPSR_C);
+				else				cpsr = set_bit(cpsr, CPSR_C);
+				if (overflowFromAdd(o0, o1, 0))	cpsr = set_bit(cpsr, CPSR_V);
+				else				cpsr = set_bit(cpsr, CPSR_V);
 				break;
 		case INSTR_ADC:	res = o0 + o1 + cflag;
-				if (carryFrom(o0, o1, cflag))	cpsr = clr_bit(cpsr, C);
-				else				cpsr = set_bit(cpsr, C);
-				if (overflowFromAdd(o0, o1, cflag))cpsr = set_bit(cpsr, V);
-				else				cpsr = set_bit(cpsr, V);
+				if (carryFrom(o0, o1, cflag))	cpsr = clr_bit(cpsr, CPSR_C);
+				else				cpsr = set_bit(cpsr, CPSR_C);
+				if (overflowFromAdd(o0, o1, cflag))cpsr = set_bit(cpsr, CPSR_V);
+				else				cpsr = set_bit(cpsr, CPSR_V);
 				break;
 		case INSTR_SBC:	res = o0 - o1 - ncflag;
-				if (borrowFrom(o0, o1, ncflag))	cpsr = clr_bit(cpsr, C);
-				else				cpsr = set_bit(cpsr, C);
-				if (overflowFromSub(o0, o1, ncflag))cpsr = set_bit(cpsr, V);
-				else				cpsr = set_bit(cpsr, V);
+				if (borrowFrom(o0, o1, ncflag))	cpsr = clr_bit(cpsr, CPSR_C);
+				else				cpsr = set_bit(cpsr, CPSR_C);
+				if (overflowFromSub(o0, o1, ncflag))cpsr = set_bit(cpsr, CPSR_V);
+				else				cpsr = set_bit(cpsr, CPSR_V);
 				break;
 		case INSTR_RSC:	res = o1 - o0 - ncflag;
-				if (borrowFrom(o1, o0, ncflag))	cpsr = clr_bit(cpsr, C);
-				else				cpsr = set_bit(cpsr, C);
-				if (overflowFromSub(o1, o0, ncflag))cpsr = set_bit(cpsr, V);
-				else				cpsr = set_bit(cpsr, V);
+				if (borrowFrom(o1, o0, ncflag))	cpsr = clr_bit(cpsr, CPSR_C);
+				else				cpsr = set_bit(cpsr, CPSR_C);
+				if (overflowFromSub(o1, o0, ncflag))cpsr = set_bit(cpsr, CPSR_V);
+				else				cpsr = set_bit(cpsr, CPSR_V);
 				break;
 		case INSTR_ORR:	res = o0 | o1;
-				if (shifter_carry_out)		cpsr = set_bit(cpsr, C);
-				else				cpsr = clr_bit(cpsr, C);
+				if (shifter_carry_out)		cpsr = set_bit(cpsr, CPSR_C);
+				else				cpsr = clr_bit(cpsr, CPSR_C);
 				break;
 		case INSTR_MOV:	res = o1;
-				if (shifter_carry_out)		cpsr = set_bit(cpsr, C);
-				else				cpsr = clr_bit(cpsr, C);
+				if (shifter_carry_out)		cpsr = set_bit(cpsr, CPSR_C);
+				else				cpsr = clr_bit(cpsr, CPSR_C);
 				break;
 		case INSTR_BIC:	res = o0 & (~o1);
-				if (shifter_carry_out)		cpsr = set_bit(cpsr, C);
-				else				cpsr = clr_bit(cpsr, C);
+				if (shifter_carry_out)		cpsr = set_bit(cpsr, CPSR_C);
+				else				cpsr = clr_bit(cpsr, CPSR_C);
 				break;
 		case INSTR_MVN:	res = ~o1;
-				if (shifter_carry_out)		cpsr = set_bit(cpsr, C);
-				else				cpsr = clr_bit(cpsr, C);
+				if (shifter_carry_out)		cpsr = set_bit(cpsr, CPSR_C);
+				else				cpsr = clr_bit(cpsr, CPSR_C);
 				break;
 		case INSTR_TST:	if (S == 0)	return UNDEFINED_INSTRUCTION;
 				res = o0 & o1;
-				if (get_bit(res, 31))		cpsr = set_bit(cpsr, N);
-				else				cpsr = clr_bit(cpsr, N);
-				if (res == 0)			cpsr = set_bit(cpsr, Z);
-				else				cpsr = clr_bit(cpsr, Z);
-				if (shifter_carry_out)		cpsr = set_bit(cpsr, C);
-				else				cpsr = clr_bit(cpsr, C);
+				if (get_bit(res, 31))		cpsr = set_bit(cpsr, CPSR_N);
+				else				cpsr = clr_bit(cpsr, CPSR_N);
+				if (res == 0)			cpsr = set_bit(cpsr, CPSR_Z);
+				else				cpsr = clr_bit(cpsr, CPSR_Z);
+				if (shifter_carry_out)		cpsr = set_bit(cpsr, CPSR_C);
+				else				cpsr = clr_bit(cpsr, CPSR_C);
 				arm_write_cpsr(p, cpsr);
 				return SUCCESS;
 		case INSTR_TEQ:	if (S == 0)	return UNDEFINED_INSTRUCTION;
 				res = eor(o0, o1);
-				if (get_bit(res, 31))		cpsr = set_bit(cpsr, N);
-				else				cpsr = clr_bit(cpsr, N);
-				if (res == 0)			cpsr = set_bit(cpsr, Z);
-				else				cpsr = clr_bit(cpsr, Z);
-				if (shifter_carry_out)		cpsr = set_bit(cpsr, C);
-				else				cpsr = clr_bit(cpsr, C);
+				if (get_bit(res, 31))		cpsr = set_bit(cpsr, CPSR_N);
+				else				cpsr = clr_bit(cpsr, CPSR_N);
+				if (res == 0)			cpsr = set_bit(cpsr, CPSR_Z);
+				else				cpsr = clr_bit(cpsr, CPSR_Z);
+				if (shifter_carry_out)		cpsr = set_bit(cpsr, CPSR_C);
+				else				cpsr = clr_bit(cpsr, CPSR_C);
 				arm_write_cpsr(p, cpsr);
 				return SUCCESS;
 		case INSTR_CMP:	if (S == 0)	return UNDEFINED_INSTRUCTION;
 				res = o0 - o1;
-				if (get_bit(res, 31))		cpsr = set_bit(cpsr, N);
-				else				cpsr = clr_bit(cpsr, N);
-				if (res == 0)			cpsr = set_bit(cpsr, Z);
-				else				cpsr = clr_bit(cpsr, Z);
-				if (borrowFrom(o0, o1, 0))	cpsr = clr_bit(cpsr, C);
-				else				cpsr = set_bit(cpsr, C);
-				if (overflowFromSub(o0, o1, 0))	cpsr = set_bit(cpsr, V);
-				else				cpsr = clr_bit(cpsr, V);
+				if (get_bit(res, 31))		cpsr = set_bit(cpsr, CPSR_N);
+				else				cpsr = clr_bit(cpsr, CPSR_N);
+				if (res == 0)			cpsr = set_bit(cpsr, CPSR_Z);
+				else				cpsr = clr_bit(cpsr, CPSR_Z);
+				if (borrowFrom(o0, o1, 0))	cpsr = clr_bit(cpsr, CPSR_C);
+				else				cpsr = set_bit(cpsr, CPSR_C);
+				if (overflowFromSub(o0, o1, 0))	cpsr = set_bit(cpsr, CPSR_V);
+				else				cpsr = clr_bit(cpsr, CPSR_V);
 				arm_write_cpsr(p, cpsr);
 				return SUCCESS;
 		case INSTR_CMN:	if (S == 0)	return UNDEFINED_INSTRUCTION;
 				res = o0 + o1;
-				if (get_bit(res, 31))		cpsr = set_bit(cpsr, N);
-				else				cpsr = clr_bit(cpsr, N);
-				if (res == 0)			cpsr = set_bit(cpsr, Z);
-				else				cpsr = clr_bit(cpsr, Z);
-				if (carryFrom(o0, o1, 0))	cpsr = set_bit(cpsr, C);
-				else				cpsr = clr_bit(cpsr, C);
-				if (overflowFromSub(o0, o1, 0))	cpsr = set_bit(cpsr, V);
-				else				cpsr = clr_bit(cpsr, V);
+				if (get_bit(res, 31))		cpsr = set_bit(cpsr, CPSR_N);
+				else				cpsr = clr_bit(cpsr, CPSR_N);
+				if (res == 0)			cpsr = set_bit(cpsr, CPSR_Z);
+				else				cpsr = clr_bit(cpsr, CPSR_Z);
+				if (carryFrom(o0, o1, 0))	cpsr = set_bit(cpsr, CPSR_C);
+				else				cpsr = clr_bit(cpsr, CPSR_C);
+				if (overflowFromSub(o0, o1, 0))	cpsr = set_bit(cpsr, CPSR_V);
+				else				cpsr = clr_bit(cpsr, CPSR_V);
 				arm_write_cpsr(p, cpsr);
 				return SUCCESS;
 		default:	return UNDEFINED_INSTRUCTION;
@@ -152,10 +152,10 @@ int arm_data_processing_shift(arm_core p, uint32_t ins)
 		}
 		else										//	Cas general (Les flags C, v sont mis a
 		{										//	jours par l'execution des instructions)
-			if (res == 0)		cpsr = set_bit(cpsr, Z);			//		Flag Z
-			else			cpsr = clr_bit(cpsr, Z);
-			if (get_bit(res, 31))	cpsr = set_bit(cpsr, N);			//		Flag N
-			else			cpsr = clr_bit(cpsr, N);
+			if (res == 0)		cpsr = set_bit(cpsr, CPSR_Z);			//		Flag Z
+			else			cpsr = clr_bit(cpsr, CPSR_Z);
+			if (get_bit(res, 31))	cpsr = set_bit(cpsr, CPSR_N);			//		Flag N
+			else			cpsr = clr_bit(cpsr, CPSR_N);
 			arm_write_cpsr(p, cpsr);
 		}
 
@@ -191,7 +191,7 @@ void readOperand(arm_core p, uint32_t ins, uint32_t *o0, uint32_t *o1, uint8_t *
 		immed		= (ins & 0x0FF);
 		rotate_imm	= (ins & 0xF00) >> 8;
 		*o1		= ror (immed, rotate_imm);
-		if (rotate_imm == 0)	*shifter_carry_out = get_bit(arm_read_cpsr(p), C);
+		if (rotate_imm == 0)	*shifter_carry_out = get_bit(arm_read_cpsr(p), CPSR_C);
 		else			*shifter_carry_out = get_bit(ins, 31);
 	}
 	else											//	Cas d'un registre
@@ -218,7 +218,7 @@ void readOperand(arm_core p, uint32_t ins, uint32_t *o0, uint32_t *o1, uint8_t *
 void readOperand1_immShift(arm_core p, uint32_t ins, uint32_t *o1, uint8_t *shifter_carry_out)
 {
 	uint8_t shift_imm	= ((ins>>7) & 0x1F);
-	uint8_t cflag		= get_bit(arm_read_cpsr(p), C);
+	uint8_t cflag		= get_bit(arm_read_cpsr(p), CPSR_C);
 
 	switch((ins>>5) & 0x3)
 	{
@@ -283,7 +283,7 @@ void readOperand1_regShift(arm_core p, uint32_t ins, uint32_t *o1, uint8_t *shif
 	uint32_t	RS	= arm_read_register(p, irs);
 	uint8_t		RS70	= RS & 0xFF;
 	uint8_t		RS40	= RS & 0x0F;
-	uint8_t		cflag	= get_bit(arm_read_cpsr(p), C);
+	uint8_t		cflag	= get_bit(arm_read_cpsr(p), CPSR_C);
 
 	if	(RS70 == 0)	{*shifter_carry_out = cflag; return;}
 	switch((ins>>5) & 0x3)

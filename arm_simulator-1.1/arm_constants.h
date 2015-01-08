@@ -52,20 +52,20 @@ Contact: Guillaume.Huard@imag.fr
 
 #define CPSR_J 24
 
-#define CPSR_GE[3] 19
-#define CPSR_GE[2] 18
-#define CPSR_GE[1] 17
-#define CPSR_GE[0] 16
+#define CPSR_GE_3 19
+#define CPSR_GE_2 18
+#define CPSR_GE_1 17
+#define CPSR_GE_0 16
 #define CPSR_E 9
 #define CPSR_A 8
 #define CPSR_I 7
 #define CPSR_F 6
 #define CPSR_T 5
-#define CPSR_M[4] 4
-#define CPSR_M[3] 3
-#define CPSR_M[2] 2
-#define CPSR_M[1] 1
-#define CPSR_M[0] 0
+#define CPSR_M_4 4
+#define CPSR_M_3 3
+#define CPSR_M_2 2
+#define CPSR_M_1 1
+#define CPSR_M_0 0
 
 
 

@@ -35,10 +35,10 @@ int evaluer_condition(arm_core p, uint32_t instruction){
 	int Z_courant, N_courant, C_courant, V_courant;
 	uint32_t CPSR_courant;	
 	CPSR_courant = arm_read_cpsr(p);	
-	N_courant=get_bit(CPSR_courant,N);
-	Z_courant=get_bit(CPSR_courant,Z);
-	C_courant=get_bit(CPSR_courant,C);
-	V_courant=get_bit(CPSR_courant,V);
+	N_courant=get_bit(CPSR_courant,CPSR_N);
+	Z_courant=get_bit(CPSR_courant,CPSR_Z);
+	C_courant=get_bit(CPSR_courant,CPSR_C);
+	V_courant=get_bit(CPSR_courant,CPSR_V);
 	//On prend que les 4 bits de condition
 	condition_courante = instruction >> 28; 
 	switch(condition_courante){
@@ -213,9 +213,8 @@ static int arm_execute_instruction(arm_core p) {
 	int condition, resultat = 1, type, categorie;
 	uint32_t instruction;
 	uint32_t cpsr;
-
 	resultat = arm_fetch(p, &instruction);
-	if(resultat == -1) {
+	if(!resultat) {
 		printf("erreur de fetch. %d\n", resultat);
 		return 0;
 	}
@@ -234,11 +233,11 @@ static int arm_execute_instruction(arm_core p) {
 				switch(type) {
 					case SHIFT_PROCESSING:
 						resultat = arm_data_processing_shift(p, instruction);
-						printf("arm_data_processing_shift\n");			
+						printf("arm_data_processing_shift");			
 						break;
 					case IMMEDIATE_PROCESSING:
 						resultat = arm_data_processing_immediate_msr(p, instruction);	
-						printf("arm_data_processing_immediate_msr\n");	
+						printf("arm_data_processing_immediate_msr");	
 						break;
 				}
 			break;
