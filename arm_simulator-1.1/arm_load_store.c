@@ -46,9 +46,7 @@ uint32_t scaledRegisterSwitch(arm_core p, uint8_t shift, uint8_t shift_imm, uint
 				index = asr(contentRm, shift_imm);
 			break;
 		case 3 : 
-			/* ROR or RRX */ 		
-						
-									/* RRX */				 									/* ROR */
+			/* ROR or RRX */		/* RRX */ 									/* ROR */
 			(shift_imm == 0) ? ((index = bitC << 31) || (contentRm >> 1)) : (index = ror(contentRm, shift_imm));
 			break;
 	}
@@ -73,6 +71,9 @@ int arm_load_store(arm_core p, uint32_t ins) {
 	uint32_t addressRn = arm_read_register(p, Rn);	// Adresse de base, contenue dans Rn
 	uint32_t contentRm = arm_read_register(p, Rm);	// Offset contenu dans le registre Rm
 	
+	uint8_t value8;
+	uint32_t value32;
+	
 	/* Variables pour Load/Store simple */
 	
 	uint8_t shifter = get_bits(ins, 12, 4);
@@ -84,15 +85,18 @@ int arm_load_store(arm_core p, uint32_t ins) {
 	uint32_t offset12 = get_bits(ins, 12, 0);
 	uint32_t contentRd = arm_read_register(p, Rd);
 	
-	uint8_t value8;
-	uint32_t value32;
-	
 	/* Variables pour Miscellaneous Load/Store */
 	
+	uint8_t S = get_bit(ins, 6);
+	uint8_t H = get_bit(ins, 5);
 	uint8_t immedH = get_bits(ins, 12, 8);
 	uint8_t immedL = get_bits(ins, 4, 0);
 	uint8_t offset8 = 0;
 	uint8_t SBZ = get_bits(ins, 12, 8);
+	
+	uint16_t value16;
+	int8_t signedValue8;
+	int16_t signedValue16;
 	
 	if(M && Rn != 15 && Rm !=15 && Rn != Rm) { // Load/Store simple
 	
@@ -136,52 +140,145 @@ int arm_load_store(arm_core p, uint32_t ins) {
 		else return UNDEFINED_INSTRUCTION;
 		
 		if(L) { // Load
-			(B) ? (arm_read_byte(p, address, &value8)) : (arm_read_word(p, address, &value32));
-			(B) ? arm_write_register(p, Rd, value8) : arm_write_register(p, Rd, value32);
+			if (B) {
+				arm_read_byte(p, address, &value8);
+				arm_write_register(p, Rd, value8);
+			}
+			else {
+				arm_read_word(p, address, &value32);
+				arm_write_register(p, Rd, value32);
+			}
 		}
 		else { // Store
 			(B) ? (arm_write_byte(p, address, (uint8_t) contentRd)) : (arm_write_word(p, address, contentRd)) ;
 		}
+		
 	}
 	else if (!M) { //Miscellaneous Load/Store
 		if(!I && P && B) {
 			if (Rn == 15) {
 				if (!W)
 					address += 8;
-				else 
-					return UNPREDICABLE;
 			}
 			offset8 = (immedH << 4) || immedL;
 			(U) ? address += addressRn + offset8 : address += addressRn - offset8 ;
 			
 		}
-		else if (!I && P && !B) {
-			if (Rm == 15 || (W && Rn == 15)) 
-				return UNPREDICABLE;
+		else if (!I && P && !B && !(Rm == 15 || (W && Rn == 15))) {
 			(U) ? address = addressRn + contentRm : address = addressRn - contentRm ;
 			
 		}
-		else if (!I && !P && B) {
-			if (Rn == 15)
-				return UNPREDICABLE;
+		else if (!I && !P && B && Rn != 15) {
 			address = addressRn;
 			offset8 = (immedH << 4) || immedL;
 			(U) ? (arm_write_register(p, Rn, addressRn + offset8)) : (arm_write_register(p, Rn, addressRn - offset8)) ;
 		}
-		else if (!I && !P && !B) {
-			if (Rn == Rm)
-				return UNPREDICABLE;
+		else if (!I && !P && !B && Rn != Rm) {
 			address = addressRn;
 			(U) ? (arm_write_register(p, Rn, addressRn + contentRm)) : (arm_write_register(p, Rn, addressRn - contentRm)) ;
 		}
+		
+		if (!L && !S && H) { /* Store Halfword */
+			arm_write_half(p, address, (uint16_t) contentRd);
+		}
+		else if (!L && S && !H) { /* Load Doubleword */
+			arm_read_word(p, address, &value32);
+			arm_write_register(p, Rd, value32);
+		}
+		else if (!L && S && H) { /* Store Doubleword */
+			arm_write_word(p, address, contentRd);
+		}
+		else if (L && !S && H) { /* Load Unsigned Halfword */
+			arm_read_half(p, address, &value16);
+			arm_write_register(p, Rd, value16);
+		}
+		else if (L && S && H) { /* Load signed Byte */
+			arm_read_byte(p, address, &signedValue8);
+			arm_write_register(p, Rd, signedValue8);
+		}
+		else if (L && S && H) { /* Load signed Halfword */
+			arm_read_half(p, address, &signedValue16);
+			arm_write_register(p, Rd, signedValue16);
+		}
 	}
 	else return UNDEFINED_INSTRUCTION;
-		
+	
     return SUCCESS;
 }
 
 int arm_load_store_multiple(arm_core p, uint32_t ins) {
-    return UNDEFINED_INSTRUCTION;
+	
+	uint8_t before = get_bit(ins, 24);
+	uint8_t increment = get_bit(ins, 23);
+	uint8_t S = get_bit(ins, 22);
+	uint8_t W = get_bit(ins, 21);
+	uint8_t L = get_bit(ins, 20);
+	
+	uint8_t Rn = get_bits(ins, 20, 16);
+	uint16_t registerList = get_bits(ins, 16, 0);	
+	
+	uint32_t startAddress = 0;
+	uint32_t endAddress = 0;
+	uint32_t addressRn = arm_read_register(p, Rn);
+	
+	uint8_t numberOfRegister = 0;
+	uint8_t listOfRegister[16];
+	
+	int i = 0;
+	for(i = 0; i < 16; i++) {
+		listOfRegister[i] = get_bit(ins, i);
+		if (listOfRegister[i])
+			numberOfRegister++;
+	}
+
+	if (L && S) 
+		return SUCCESS;
+		
+	if (!before && increment) { /* IA */
+		startAddress = addressRn;
+		endAddress = addressRn + (numberOfRegister * 4) - 4;
+	}
+	else if (before && increment) { /* IB */
+		startAddress = addressRn + 4;
+		endAddress = addressRn + (numberOfRegister * 4);
+	}
+	else if (!before && !increment) { /* DA */
+		startAddress = addressRn - (numberOfRegister * 4) + 4;
+		endAddress = addressRn;
+	}
+	else if (before && !increment) { /* DB */
+		startAddress = addressRn - (numberOfRegister * 4);
+		endAddress = addressRn - 4;
+	}
+	
+	if (W)
+		(increment) ? arm_write_register(p, Rn, addressRn - (numberOfRegister * 4)) : arm_write_register(p, Rn, addressRn + (numberOfRegister * 4));
+		
+	if (L) { /* Load */
+		i = 0;
+		while (numberOfRegister && startAddress != endAddress) {
+			while (!listOfRegister[i] && i < 16) {
+				i++;
+			}
+			arm_read_word(p, startAddress, &value32);
+			arm_write_register(p, i, value32);
+			startAddress += 4;
+			numberOfRegister--;
+		}
+	}
+	else { /* Store */
+		i = 0;
+		while (numberOfRegister && startAddress != endAddress) {
+			while (!listOfRegister[i] && i < 16) {
+				i++;
+			}
+			arm_write_word(p, startAddress, arm_read_register(p, i));
+			startAddress += 4;
+			numberOfRegister--;
+		}
+	}
+	
+    return SUCCESS;
 }
 
 int arm_coprocessor_load_store(arm_core p, uint32_t ins) {
