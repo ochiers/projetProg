@@ -26,8 +26,31 @@ Contact: Guillaume.Huard@imag.fr
 #include <debug.h>
 #include <stdlib.h>
 
+#define LR 14
+#define PC 15
+
+
 
 int arm_branch(arm_core p, uint32_t ins) {
+	int bit24=get_bit(ins, 24);
+	uint32_t target_address;
+	uint_32_t PC_courant;
+	
+	PC_courant = arm_read_register(p, PC);
+	target_address=lecture_entier_immediat_signe_24bits(ins) << 2;  //Lecture de signed_immed_24 et multiplication par 4 car instructions sur 32bits
+
+	target_address+=PC_courant;
+	
+	if ( bit24 ) {
+		arm_write_register(p, LR, PC_courant);
+	}
+    arm_write_register(p, PC, target_address);
+	
+	return SUCCESS;
+}	
+
+
+int arm_branch_X(arm_core p, uint32_t ins){
     return UNDEFINED_INSTRUCTION;
 }
 
@@ -43,4 +66,18 @@ int arm_coprocessor_others_swi(arm_core p, uint32_t ins) {
 
 int arm_miscellaneous(arm_core p, uint32_t ins) {
     return UNDEFINED_INSTRUCTION;
+}
+
+
+
+
+
+
+uint32_t lecture_entier_immediat_signe_24bits(uint32_t instruction){
+	uint32_t valeur=get_bits(instruction, 23, 0);
+
+	if ( valeur & 0x800000 ) { //Si le bit 23 est à 1: valeur negative, on complete avec des 1 pour passer en signé sur 32 bits
+		valeur = valeur | 0xFF000000 ;
+	}
+	return valeur;
 }

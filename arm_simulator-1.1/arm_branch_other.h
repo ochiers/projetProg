@@ -26,7 +26,14 @@ Contact: Guillaume.Huard@imag.fr
 #include "arm_core.h"
 
 int arm_branch(arm_core p, uint32_t ins);
+
+//!!! L'utilisation de BLX avec un registre impair fait passer au jeu d'instruction Thumb
+// Cette fonctionnalité n'étant (pas encore ;) implémenter,
+// BLX NE DOIT ETRE APPELÉ QUE SUR DES REGISTRES PAIR
+int arm_branch_X(arm_core p, uint32_t ins);
 int arm_coprocessor_others_swi(arm_core p, uint32_t ins);
 int arm_miscellaneous(arm_core p, uint32_t ins);
+
+uint32_t lecture_entier_immediat_signe_24bits(uint32_t instruction)
 
 #endif
