@@ -34,7 +34,7 @@ Contact: Guillaume.Huard@imag.fr
 int arm_branch(arm_core p, uint32_t ins) {
 	int bit24=get_bit(ins, 24);
 	uint32_t target_address;
-	uint_32_t PC_courant;
+	uint32_t PC_courant;
 	
 	PC_courant = arm_read_register(p, PC);
 	target_address=lecture_entier_immediat_signe_24bits(ins) << 2;  //Lecture de signed_immed_24 et multiplication par 4 car instructions sur 32bits
