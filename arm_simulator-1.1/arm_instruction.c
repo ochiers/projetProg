@@ -216,37 +216,38 @@ void affichage_condition(uint32_t instruction) {
 	printf(" -> ");
 	switch(condition) {
 		case 0000:
-			printf("Z = 1\n");
+			printf("Z = 1\n");		break;
 		case 0001:
-			printf("Z = 0\n");
+			printf("Z = 0\n");		break;
 		case 0010:
-			printf("C = 1\n");
+			printf("C = 1\n");		break;
 		case 0011:
-			printf("C = 0\n");
+			printf("C = 0\n");		break;
 		case 0100:
-			printf("N = 1\n");
+			printf("N = 1\n");		break;
 		case 0101:
-			printf("N = 0\n");
+			printf("N = 0\n");		break;
 		case 0110:
-			printf("V = 1\n");
+			printf("V = 1\n");		break;
 		case 0111:
-			printf("V = 0\n");
+			printf("V = 0\n");		break;
 		case 1000:
-			printf("C = 1 && Z = 0\n");
+			printf("C = 1 && Z = 0\n");	break;
 		case 1001:
-			printf("C = 0 && Z = 1\n");
+			printf("C = 0 && Z = 1\n");	break;
 		case 1010:
-			printf("N = V\n");
+			printf("N = V\n");		break;
 		case 1011:
-			printf("N != V\n");
+			printf("N != V\n");		break;
 		case 1100:
-			printf("Z = 0 && N = V\n");
+			printf("Z = 0 && N = V\n");	break;
 		case 1101:
-			printf("Z = 1 || N != V\n");
+			printf("Z = 1 || N != V\n");	break;
 		case 1110:
-			printf("Always\n");
+			printf("Always\n");		break;
 		case 1111:
-			printf("miscellaneous\n");			
+			printf("miscellaneous\n");	break;
+	}
 }
 ////////////////////////////////////////////////////////////////////////////////
 void affichage_instruction(uint32_t instruction) {
@@ -254,7 +255,7 @@ void affichage_instruction(uint32_t instruction) {
 	champ_categorie = instruction >> 25;
 	champ_categorie &= 0x7;
 	printf("instruction : ");
-	printBin(chap_categorie, 3);
+	printBin(champ_categorie, 3);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
