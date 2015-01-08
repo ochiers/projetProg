@@ -217,6 +217,7 @@ static int arm_execute_instruction(arm_core p) {
 		debug("erreur de fetch. %d\n", resultat);
 		return 0;
 	}
+	debug("instruction %x\n", instruction);
 	condition = evaluer_condition(p, instruction);
 	categorie = evaluer_categorie(p, instruction);
 	if (!condition) {
@@ -228,22 +229,28 @@ static int arm_execute_instruction(arm_core p) {
 				type = sous_categorie_processing(instruction);
 				switch(type) {
 					case SHIFT_PROCESSING:
-						resultat = arm_data_processing_shift(p, instruction);			break;
+						resultat = arm_data_processing_shift(p, instruction);			
+						debug("instruction : %d\n", resultat);							break;
 					case IMMEDIATE_PROCESSING:
-						resultat = arm_data_processing_immediate_msr(p, instruction);	break;
+						resultat = arm_data_processing_immediate_msr(p, instruction);	
+						debug("instruction : %d\n", resultat);							break;
 				}
 			break;
 			case LOAD_STORE:
 				type = sous_categorie_load_store(instruction);
 				switch(type) {
 					case SIMPLE_LOAD_STORE:
-						resultat = arm_load_store(p, instruction);				break;
+						resultat = arm_load_store(p, instruction);				
+						debug("instruction : %d\n", resultat);					break;
 					case MULTIPLE_LOAD_STORE:
-						resultat = arm_load_store_multiple(p, instruction);		break;
+						resultat = arm_load_store_multiple(p, instruction);		
+						debug("instruction : %d\n", resultat);					break;
 					case EXTRA_LOAD_STORE:
-						resultat = arm_load_store(p, instruction);				break;
+						resultat = arm_load_store(p, instruction);				
+						debug("instruction : %d\n", resultat);					break;
 					case COPROCESSOR_LOAD_STORE:
-						resultat = arm_coprocessor_load_store(p, instruction);	break;						
+						resultat = arm_coprocessor_load_store(p, instruction);	
+						debug("instruction : %d\n", resultat);					break;						
 				}
 			break;
 			/*case BRANCH_AUTRES:
