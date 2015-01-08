@@ -49,9 +49,34 @@ int arm_branch(arm_core p, uint32_t ins) {
 	return SUCCESS;
 }	
 
-
+// Attention !!! BLX vers une addresse impaire enclenche le jeu d'instruction Thumb
+// Cette partie du processeur n'est pas simulé, option non disponible
 int arm_branch_X(arm_core p, uint32_t ins){
-    return UNDEFINED_INSTRUCTION;
+	int champ_Rm=get_bits(ins,4,0); 
+	uint32_t target_address;
+	uint32_t PC_courant;
+	uint32_t CPSR_courant;
+		
+		target_address = arm_read_register(p, champ_Rm); //target=Rm
+		
+		//Remarque: target[0] ne doit pas valoir 1 (voir spécification
+		CPSR_courant = arm_read_cpsr(p);					//
+		if (get_bit(target_address,0)){						//
+			return UNIMPLEMENTED_INSTRUCTION;				//
+			CPSR_courant=set_bit(CPSR_courant, 0);			//// CPSR T bit = target[0]
+		} else {											//
+			CPSR_courant=clr_bit(CPSR_courant, 0);			//
+		}													//	
+		PC_courant = arm_read_register(p, PC);	//
+		arm_write_register(p, LR, PC_courant);	// LR =  address of instruction after the BLX instruction
+		
+
+		arm_write_cpsr(p, CPSR_courant);						//
+
+		arm_write_register(p, PC, target_address & 0xFFFFFFFE);	// PC = target AND 0xFFFFFFFE
+		
+		return SUCCESS;	
+		
 }
 
 int arm_coprocessor_others_swi(arm_core p, uint32_t ins) {
