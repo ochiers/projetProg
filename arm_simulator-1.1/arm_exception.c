@@ -37,8 +37,6 @@ Contact: Guillaume.Huard@imag.fr
 
 void arm_exception(arm_core p, unsigned char exception)
 {
-	uint32_t cpsr = arm_readcpsr(p);
-
 	switch(exception)
 	{
 		case RESET:							// Semantics of reset interrupt (ARM manual A2-18)
@@ -51,7 +49,7 @@ void arm_exception(arm_core p, unsigned char exception)
 			break;
 
 
-/*#define SOFTWARE_INTERRUPT      3
+#define SOFTWARE_INTERRUPT      3
 #define PREFETCH_ABORT          4
 #define DATA_ABORT              5
 #define INTERRUPT               6
