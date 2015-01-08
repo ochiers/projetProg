@@ -209,17 +209,68 @@ int sous_categorie_processing(uint32_t instruction) {
 	return resultat;
 }
 ////////////////////////////////////////////////////////////////////////////////
+void affichage_condition(uint32_t instruction) {
+	uint32_t condition = (instruction >> 28);
+	printf("condition : ");
+	printBin(condition, 4);
+	printf(" -> ");
+	switch(condition) {
+		case 0000:
+			printf("Z = 1\n");
+		case 0001:
+			printf("Z = 0\n");
+		case 0010:
+			printf("C = 1\n");
+		case 0011:
+			printf("C = 0\n");
+		case 0100:
+			printf("N = 1\n");
+		case 0101:
+			printf("N = 0\n");
+		case 0110:
+			printf("V = 1\n");
+		case 0111:
+			printf("V = 0\n");
+		case 1000:
+			printf("C = 1 && Z = 0\n");
+		case 1001:
+			printf("C = 0 && Z = 1\n");
+		case 1010:
+			printf("N = V\n");
+		case 1011:
+			printf("N != V\n");
+		case 1100:
+			printf("Z = 0 && N = V\n");
+		case 1101:
+			printf("Z = 1 || N != V\n");
+		case 1110:
+			printf("Always\n");
+		case 1111:
+			printf("miscellaneous\n");			
+}
+////////////////////////////////////////////////////////////////////////////////
+void affichage_instruction(uint32_t instruction) {
+	uint32_t champ_categorie;
+	champ_categorie = instruction >> 25;
+	champ_categorie &= 0x7;
+	printf("instruction : ");
+	printBin(chap_categorie, 3);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 static int arm_execute_instruction(arm_core p) {
 	int condition, resultat = 1, type, categorie;
 	uint32_t instruction;
 	uint32_t cpsr;
 	resultat = arm_fetch(p, &instruction);
-	if(!resultat) {
+	if(resultat == -1) {
 		printf("erreur de fetch. %d\n", resultat);
 		return 0;
 	}
-	printf("instruction : ");
-	printBin(instruction, 32);
+	
+	affichage_condition(instruction);
+	affichage_instruction(instruction);
+	
 	condition = evaluer_condition(p, instruction);
 	categorie = evaluer_categorie(p, instruction);
     
