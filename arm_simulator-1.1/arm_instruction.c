@@ -147,7 +147,8 @@ int evaluer_categorie(arm_core p, uint32_t instruction) {
 		case 6:
 			categorie = NON_ENCORE_TRAITE; //ligne 15
 			break; 
-	}	
+	}
+	return categorie;	
 }
 ////////////////////////////////////////////////////////////////////////////////
 int sous_categorie_load_store(uint32_t instruction) { //a check avec Seb
@@ -183,11 +184,13 @@ int sous_categorie_processing(uint32_t instruction) {
 	champ_categorie = instruction >> 25;
 	champ_categorie &= 0x7;
 	int resultat = -1;
-	uint32_t bit4, bit5, bit6, bit7, bit25, bit26, bit27;
+	uint32_t bit4, bit7, bit20, bit21, bit23, bit24, bit25, bit26, bit27;
 	bit4 = get_bit(instruction, 4);
-	bit5 = get_bit(instruction, 5);
-	bit6 = get_bit(instruction, 6);	
 	bit7 = get_bit(instruction, 7);
+	bit20 = get_bit(instruction, 20);
+	bit21 = get_bit(instruction, 21);
+	bit23 = get_bit(instruction, 23);	
+	bit24 = get_bit(instruction, 24);	
 	bit25 = get_bit(instruction, 25);
 	bit26 = get_bit(instruction, 26);
 	bit27 = get_bit(instruction, 27);
@@ -205,10 +208,9 @@ int sous_categorie_processing(uint32_t instruction) {
 	}	
 	return resultat;
 }
-
 ////////////////////////////////////////////////////////////////////////////////
 static int arm_execute_instruction(arm_core p) {
-	int condition, resultat = 1;
+	int condition, resultat = 1, type, categorie;
 	uint32_t instruction;	
 	resultat = arm_fetch(p, &instruction);
 	if(!resultat) {
@@ -226,30 +228,30 @@ static int arm_execute_instruction(arm_core p) {
 				type = sous_categorie_processing(instruction);
 				switch(type) {
 					case SHIFT_PROCESSING:
-						resultat = arm_data_processing_shift(p, ins);		break;
+						resultat = arm_data_processing_shift(p, instruction);			break;
 					case IMMEDIATE_PROCESSING:
-						resultat = arm_data_processing_immediate(p, ins);	break;
+						resultat = arm_data_processing_immediate_msr(p, instruction);	break;
 				}
 			break;
 			case LOAD_STORE:
 				type = sous_categorie_load_store(instruction);
 				switch(type) {
 					case SIMPLE_LOAD_STORE:
-						resultat = arm_load_store(p, instruction);			break;
+						resultat = arm_load_store(p, instruction);				break;
 					case MULTIPLE_LOAD_STORE:
-						resultat = arm_load_store_multiple(p, instruction);	break;
+						resultat = arm_load_store_multiple(p, instruction);		break;
 					case EXTRA_LOAD_STORE:
-						resultat = arm_load_store(p, instruction);			break;
+						resultat = arm_load_store(p, instruction);				break;
 					case COPROCESSOR_LOAD_STORE:
-						resultat = arm_coprocessor_load_store(p, ins);		break;						
+						resultat = arm_coprocessor_load_store(p, instruction);	break;						
 				}
 			break;
-			case BRANCH_AUTRES:
-				//type = sous_categorie_branch_autres(instruction);
-				//switch(type){
-					//non implementé
+			/*case BRANCH_AUTRES:
+				type = sous_categorie_branch_autres(instruction);
+				switch(type){
+					non implementé
 				}
-			break;
+			break; */
 			case NON_ENCORE_TRAITE:
 				resultat = 1;
 			break;
