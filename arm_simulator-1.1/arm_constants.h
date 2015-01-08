@@ -61,11 +61,11 @@ Contact: Guillaume.Huard@imag.fr
 #define CPSR_I 7
 #define CPSR_F 6
 #define CPSR_T 5
-#define CPSR_M[4] 16
-#define CPSR_M[3] 16
-#define CPSR_M[2] 16
-#define CPSR_M[1] 16
-#define CPSR_M[0] 16
+#define CPSR_M[4] 4
+#define CPSR_M[3] 3
+#define CPSR_M[2] 2
+#define CPSR_M[1] 1
+#define CPSR_M[0] 0
 
 
 
