@@ -35,11 +35,24 @@ Contact: Guillaume.Huard@imag.fr
 
 #define Exception_bit_9 (CP15_reg1_EEbit << 9)
 
-void arm_exception(arm_core p, unsigned char exception) {
-    /* We only support RESET initially */
-    /* Semantics of reset interrupt (ARM manual A2-18) */
-    if (exception == RESET) {
-        arm_write_cpsr(p, 0x1d3 | Exception_bit_9);
-	arm_write_usr_register(p, PC_USER, 0);
-    }
+void arm_exception(arm_core p, unsigned char exception)
+{
+	switch(exception)
+	{
+		case RESET:							// Semantics of reset interrupt (ARM manual A2-18)
+			arm_write_cpsr(p, 0x1d3 | Exception_bit_9);
+			arm_write_usr_register(p, PC_USER, 0);
+			break;
+/*#define RESET                   1
+#define UNDEFINED_INSTRUCTION   2
+#define SOFTWARE_INTERRUPT      3
+#define PREFETCH_ABORT          4
+#define DATA_ABORT              5
+#define INTERRUPT               6
+#define FAST_INTERRUPT          7
+*/		default:
+			printf("\n\n**** Traitement d'execption ****\n");
+			printf("\n\n**** Exception non geree: %d ****\n", exception);
+			exit(0);
+	}
 }

@@ -206,8 +206,6 @@ int sous_categorie_processing(uint32_t instruction) {
 	return resultat;
 }
 
-#define SHIFT_PROCESSING 0
-#define IMMEDIATE_PROCESSING 1
 ////////////////////////////////////////////////////////////////////////////////
 static int arm_execute_instruction(arm_core p) {
 	int condition, resultat = 1;

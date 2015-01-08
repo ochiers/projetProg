@@ -1,25 +1,3 @@
-/*
-Armator - simulateur de jeu d'instruction ARMv5T à but pédagogique
-Copyright (C) 2011 Guillaume Huard
-Ce programme est libre, vous pouvez le redistribuer et/ou le modifier selon les
-termes de la Licence Publique Générale GNU publiée par la Free Software
-Foundation (version 2 ou bien toute autre version ultérieure choisie par vous).
-
-Ce programme est distribué car potentiellement utile, mais SANS AUCUNE
-GARANTIE, ni explicite ni implicite, y compris les garanties de
-commercialisation ou d'adaptation dans un but spécifique. Reportez-vous à la
-Licence Publique Générale GNU pour plus de détails.
-
-Vous devez avoir reçu une copie de la Licence Publique Générale GNU en même
-temps que ce programme ; si ce n'est pas le cas, écrivez à la Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307,
-États-Unis.
-
-Contact: Guillaume.Huard@imag.fr
-         ENSIMAG - Laboratoire LIG
-         51 avenue Jean Kuntzmann
-         38330 Montbonnot Saint-Martin
-*/
 #include "arm_data_processing.h"
 #include "arm_exception.h"
 #include "arm_constants.h"
@@ -35,63 +13,168 @@ Contact: Guillaume.Huard@imag.fr
 
 
 
+int arm_data_processing_immediate_msr(arm_core p, uint32_t ins)
+{
+    return UNDEFINED_INSTRUCTION;
+}
 // ------------------------------------------
 // Decoding functions for different classes of instructions
+// Execute la fonction
+// Met a jours le registre destination
+// Met a jour le registre d'etat cpsr en fonction du bit S et
+// de l'algo de la commande
 // ------------------------------------------
 int arm_data_processing_shift(arm_core p, uint32_t ins)
 {
 	uint32_t res=0, o0, o1;
-	uint8_t rd, S, cond, op, shifter_carry_out;
-	char test;
+	uint32_t cpsr = arm_read_cpsr(p);
+	uint8_t rd, S, op, shifter_carry_out;
+	uint8_t cflag = (get_bit(cpsr, C) >> C);
+	uint8_t ncflag = ((~cflag) & 0x1);
 
-	test = readOperand(p, ins, &o0, &o1, &shifter_carry_out, &rd, &S, &op);
-
-	if (test == -1)	return UNDEFINED_INSTRUCTION;	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% a faire
-	switch(i)
+	readOperand(p, ins, &o0, &o1, &shifter_carry_out, &rd, &S, &op);			// Parser l'instruction
+	switch(op)										// Executer l'instruction
 	{
-		case INSTR_AND:	res = o0 & o1;				break;
-		case INSTR_EOR:	res = eor(o0, o1);			break;
-		case INSTR_SUB:	res = o0 - o1;				break;
-		case INSTR_RSB:	res = o1 - o0;				break;
-		case INSTR_ADD:	res = o0 + o1;				break;
-		case INSTR_ADC:	res = o0 + o1 + (p->cpsr & (1<<C));	break;
-		case INSTR_SBC:	break;				// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% voir page 275
-		case INSTR_RSC:	test = rsc(o1, o2, *res, *cond);	break;
-		case INSTR_TST:	test = tst(o1, o2, *res, *cond);	break;
-		case INSTR_TEQ:	test = teq(o1, o2, *res, *cond);	break;
-		case INSTR_CMP:	test = cmp(o1, o2, *res, *cond);	break;
-		case INSTR_CMN:	test = cmn(o1, o2, *res, *cond);	break;
-		case INSTR_ORR:	test = orr(o1, o2, *res, *cond);	break;
-		case INSTR_MOV:	test = mov(o1, o2, *res, *cond);	break;
-		case INSTR_BIC:	test = bic(o1, o2, *res, *cond);	break;
-		case INSTR_MVN:	test = mvn(o1, o2, *res, *cond);	break;
-		default return UNDEFINED_INSTRUCTION;
+		case INSTR_AND:	res = o0 & o1;
+				if (shifter_carry_out)		cpsr = set_bit(cpsr, C);
+				else				cpsr = clr_bit(cpsr, C);
+				break;
+		case INSTR_EOR:	res = eor(o0, o1);
+				if (shifter_carry_out)		cpsr = set_bit(cpsr, C);
+				else				cpsr = clr_bit(cpsr, C);
+				break;
+		case INSTR_SUB:	res = o0 - o1;
+				if (borrowFrom(o0, o1, 0))	cpsr = clr_bit(cpsr, C);
+				else				cpsr = set_bit(cpsr, C);
+				if (overflowFromSub(o0, o1, 0))	cpsr = set_bit(cpsr, V);
+				else				cpsr = set_bit(cpsr, V);
+				break;
+		case INSTR_RSB:	res = o1 - o0;
+				if (borrowFrom(o1, o0, 0))	cpsr = clr_bit(cpsr, C);
+				else				cpsr = set_bit(cpsr, C);
+				if (overflowFromSub(o1, o0, 0))	cpsr = set_bit(cpsr, V);
+				else				cpsr = set_bit(cpsr, V);
+				break;
+		case INSTR_ADD:	res = o0 + o1;
+				if (carryFrom(o0, o1, 0))	cpsr = clr_bit(cpsr, C);
+				else				cpsr = set_bit(cpsr, C);
+				if (overflowFromAdd(o0, o1, 0))	cpsr = set_bit(cpsr, V);
+				else				cpsr = set_bit(cpsr, V);
+				break;
+		case INSTR_ADC:	res = o0 + o1 + cflag;
+				if (carryFrom(o0, o1, cflag))	cpsr = clr_bit(cpsr, C);
+				else				cpsr = set_bit(cpsr, C);
+				if (overflowFromAdd(o0, o1, cflag))cpsr = set_bit(cpsr, V);
+				else				cpsr = set_bit(cpsr, V);
+				break;
+		case INSTR_SBC:	res = o0 - o1 - ncflag;
+				if (borrowFrom(o0, o1, ncflag))	cpsr = clr_bit(cpsr, C);
+				else				cpsr = set_bit(cpsr, C);
+				if (overflowFromSub(o0, o1, ncflag))cpsr = set_bit(cpsr, V);
+				else				cpsr = set_bit(cpsr, V);
+				break;
+		case INSTR_RSC:	res = o1 - o0 - ncflag;
+				if (borrowFrom(o1, o0, ncflag))	cpsr = clr_bit(cpsr, C);
+				else				cpsr = set_bit(cpsr, C);
+				if (overflowFromSub(o1, o0, ncflag))cpsr = set_bit(cpsr, V);
+				else				cpsr = set_bit(cpsr, V);
+				break;
+		case INSTR_ORR:	res = o0 | o1;
+				if (shifter_carry_out)		cpsr = set_bit(cpsr, C);
+				else				cpsr = clr_bit(cpsr, C);
+				break;
+		case INSTR_MOV:	res = o1;
+				if (shifter_carry_out)		cpsr = set_bit(cpsr, C);
+				else				cpsr = clr_bit(cpsr, C);
+				break;
+		case INSTR_BIC:	res = o0 & (~o1);
+				if (shifter_carry_out)		cpsr = set_bit(cpsr, C);
+				else				cpsr = clr_bit(cpsr, C);
+				break;
+		case INSTR_MVN:	res = ~o1;
+				if (shifter_carry_out)		cpsr = set_bit(cpsr, C);
+				else				cpsr = clr_bit(cpsr, C);
+				break;
+		case INSTR_TST:	if (S == 0)	return UNDEFINED_INSTRUCTION;
+				res = o0 & o1;
+				if (get_bit(res, 31))		cpsr = set_bit(cpsr, N);
+				else				cpsr = clr_bit(cpsr, N);
+				if (res == 0)			cpsr = set_bit(cpsr, Z);
+				else				cpsr = clr_bit(cpsr, Z);
+				if (shifter_carry_out)		cpsr = set_bit(cpsr, C);
+				else				cpsr = clr_bit(cpsr, C);
+				arm_write_cpsr(p, cpsr);
+				return SUCCESS;
+		case INSTR_TEQ:	if (S == 0)	return UNDEFINED_INSTRUCTION;
+				res = eor(o0, o1);
+				if (get_bit(res, 31))		cpsr = set_bit(cpsr, N);
+				else				cpsr = clr_bit(cpsr, N);
+				if (res == 0)			cpsr = set_bit(cpsr, Z);
+				else				cpsr = clr_bit(cpsr, Z);
+				if (shifter_carry_out)		cpsr = set_bit(cpsr, C);
+				else				cpsr = clr_bit(cpsr, C);
+				arm_write_cpsr(p, cpsr);
+				return SUCCESS;
+		case INSTR_CMP:	if (S == 0)	return UNDEFINED_INSTRUCTION;
+				res = o0 - o1;
+				if (get_bit(res, 31))		cpsr = set_bit(cpsr, N);
+				else				cpsr = clr_bit(cpsr, N);
+				if (res == 0)			cpsr = set_bit(cpsr, Z);
+				else				cpsr = clr_bit(cpsr, Z);
+				if (borrowFrom(o0, o1, 0))	cpsr = clr_bit(cpsr, C);
+				else				cpsr = set_bit(cpsr, C);
+				if (overflowFromSub(o0, o1, 0))	cpsr = set_bit(cpsr, V);
+				else				cpsr = clr_bit(cpsr, V);
+				arm_write_cpsr(p, cpsr);
+				return SUCCESS;
+		case INSTR_CMN:	if (S == 0)	return UNDEFINED_INSTRUCTION;
+				res = o0 + o1;
+				if (get_bit(res, 31))		cpsr = set_bit(cpsr, N);
+				else				cpsr = clr_bit(cpsr, N);
+				if (res == 0)			cpsr = set_bit(cpsr, Z);
+				else				cpsr = clr_bit(cpsr, Z);
+				if (carryFrom(o0, o1, 0))	cpsr = set_bit(cpsr, C);
+				else				cpsr = clr_bit(cpsr, C);
+				if (overflowFromSub(o0, o1, 0))	cpsr = set_bit(cpsr, V);
+				else				cpsr = clr_bit(cpsr, V);
+				arm_write_cpsr(p, cpsr);
+				return SUCCESS;
+		default:	return UNDEFINED_INSTRUCTION;
 	}
-	if (test == -1)	return UNDEFINED_INSTRUCTION;	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% a faire
-	arm_write_register(p, rd, res);
-	if (S)
+	arm_write_register(p, rd, res);								// Ecriture du resultat
+	if (S)											// Mise a jour du cpsr
 	{
-		test = writeCondition(p, rd, res);
-		if (!test) return UNPREDICTABLE;
+		if (rd == 15)									//	Cas d'un changement de pc
+		{
+			if (arm_current_mode_has_spsr(p)) arm_write_cpsr(p, arm_read_spsr(p));	//		CPSR <- SPSR
+												//		else return UNPREDICTABLE;
+												//		Droit d'acces a CPSR refuse
+		}
+		else										//	Cas general (Les flags C, v sont mis a
+		{										//	jours par l'execution des instructions)
+			if (res == 0)		cpsr = set_bit(cpsr, Z);			//		Flag Z
+			else			cpsr = clr_bit(cpsr, Z);
+			if (get_bit(res, 31))	cpsr = set_bit(cpsr, N);			//		Flag N
+			else			cpsr = clr_bit(cpsr, N);
+			arm_write_cpsr(p, cpsr);
+		}
+
 	}
 	return SUCCESS;
-}
-int arm_data_processing_immediate_msr(arm_core p, uint32_t ins) {
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% a faire
-    return UNDEFINED_INSTRUCTION;
 }
 // ------------------------------------------
 // Lit les valeur des registres dans l'instruction
 // Parametre d'entree:
-//	- p:		etat du processeur
-//	- ins:		instruction
+//	- p:			etat du processeur
+//	- ins:			instruction
 // Parametre de sortie:
-//	- o0, o1:	Valeur des operandes 0 et 1
-//	- rd:		numero du registre destination
-//	- S: 		indique si les codes conditions doivent etre mis a jours
-// Rend -1 en cas d'erreur et 0 si non
+//	- o0, o1:		Valeur des operandes 0 et 1
+//	- shifter_carry_out:	retenue sortante de l'opperande o1
+//	- rd:			numero du registre destination
+//	- S: 			indique si les codes conditions doivent etre mis a jours
+//	- op:			code de l'operation a realiser
 // ------------------------------------------
-char readOperand(arm_core p, uint32_t ins, uint32_t *o0, uint32_t *o1, uint8_t *shifter_carry_out, uint8_t *rd, uint8_t *S, uint8_t *op)
+void readOperand(arm_core p, uint32_t ins, uint32_t *o0, uint32_t *o1, uint8_t *shifter_carry_out, uint8_t *rd, uint8_t *S, uint8_t *op)
 {
 	uint8_t irn, irm, I, rotate_imm;
 	uint32_t immed;
@@ -108,8 +191,8 @@ char readOperand(arm_core p, uint32_t ins, uint32_t *o0, uint32_t *o1, uint8_t *
 		immed		= (ins & 0x0FF);
 		rotate_imm	= (ins & 0xF00) >> 8;
 		*o1		= ror (immed, rotate_imm);
-		if (rotate_imm == 0)	shifter_carry_out = get_bit(p->cpsr, C);
-		else			shifter_carry_out = get_bit(ins, 31);
+		if (rotate_imm == 0)	*shifter_carry_out = get_bit(arm_read_cpsr(p), C);
+		else			*shifter_carry_out = get_bit(ins, 31);
 	}
 	else											//	Cas d'un registre
 	{
@@ -118,7 +201,6 @@ char readOperand(arm_core p, uint32_t ins, uint32_t *o0, uint32_t *o1, uint8_t *
 		if (get_bit(ins, 4))	readOperand1_regShift(p, ins, o1, shifter_carry_out);	//		Cas d'un shift lu dans un registre
 		else			readOperand1_immShift(p, ins, o1, shifter_carry_out);	//		Cas d'un shift lu dans un immediat
 	}
-	return 0;
 }
 // ------------------------------------------
 // Lit la valeur de l'opperande 1 et du shifter_carry dans le
@@ -135,11 +217,12 @@ char readOperand(arm_core p, uint32_t ins, uint32_t *o0, uint32_t *o1, uint8_t *
 // ------------------------------------------
 void readOperand1_immShift(arm_core p, uint32_t ins, uint32_t *o1, uint8_t *shifter_carry_out)
 {
-	uint8_t shift_imm = ((ins>>7) & 0x1F);
+	uint8_t shift_imm	= ((ins>>7) & 0x1F);
+	uint8_t cflag		= get_bit(arm_read_cpsr(p), C);
 
 	switch((ins>>5) & 0x3)
 	{
-		case 0: if (shift_imm == 0)	*shifter_carry_out = get_bit(p->cpsr, C);
+		case 0: if (shift_imm == 0)	*shifter_carry_out = cflag;
 			else
 			{
 				*shifter_carry_out	= get_bit(*o1, (32-shift_imm));
@@ -171,12 +254,12 @@ void readOperand1_immShift(arm_core p, uint32_t ins, uint32_t *o1, uint8_t *shif
 			break;
 		case 3:	if (shift_imm == 0)
 			{
-				*shifter_carry_out	= get_bit(*o1, 0));
-				*o1			= ((lsl(get_bit(p->cpsr, C)), 31) | (lsr(*o1, 1)));
+				*shifter_carry_out	= get_bit(*o1, 0);
+				*o1			= (lsl(cflag, 31)) | (lsr(*o1, 1));
 			}
 			else
 			{
-				*shifter_carry_out	= get_bit(*o1, shift_imm));
+				*shifter_carry_out	= get_bit(*o1, shift_imm-1);
 				*o1			= ror(*o1, shift_imm);
 			}
 			break;
@@ -200,8 +283,9 @@ void readOperand1_regShift(arm_core p, uint32_t ins, uint32_t *o1, uint8_t *shif
 	uint32_t	RS	= arm_read_register(p, irs);
 	uint8_t		RS70	= RS & 0xFF;
 	uint8_t		RS40	= RS & 0x0F;
+	uint8_t		cflag	= get_bit(arm_read_cpsr(p), C);
 
-	if	(RS70 == 0)	{*shifter_carry_out = get_bit(p->cpsr, C); return;}
+	if	(RS70 == 0)	{*shifter_carry_out = cflag; return;}
 	switch((ins>>5) & 0x3)
 	{
 		case 0: 
@@ -257,56 +341,4 @@ void readOperand1_regShift(arm_core p, uint32_t ins, uint32_t *o1, uint8_t *shif
 			}
 			break;
 	}
-}
-// ------------------------------------------
-// Ecrit le code condition dans le registre
-// CPSR de p en fonction du resultat du calcul res
-// parametre:
-//	- rd:	numero du registre destination
-//	- res:	valeur du resulata
-// Return 0 en cas de succes ou un code erreur si non (UNPREDICTABLE)
-// ------------------------------------------
-void writeCondition(arm_core p, uint8_t rd, uint32_t res)
-{
-	if (rd == 15)
-	{
-		if (arm_current_mode_has_spsr(p))	arm_write_cpsr(p, arm_read_cpsr(p));	// CPSR <- SPSR
-		else return -1;									// Droit d'acces a CPSR refuse
-	}
-	else
-	{
-		uint32_t cpsr = arm_read_cpsr(p);
-		if (res == 0)		set_bit(cpsr, Z);
-		else			clr_bit(cpsr, Z);
-
-		if (get_bit(res, 31))	set_bit(cpsr, N);
-		else			clr_bit(cpsr, N);
-
-		if (shifter_carry_out)	set_bit(cpsr, C);
-		else			clr_bit(cpsr, C);
-		if (res > 0x0FFFFFFFF)	set_bit(cpsr, V);///%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/// Non specifie par la doc
-		else			clr_bit(cpsr, V);///%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/// Non specifie par la doc
-	}
-	return 1;
-
-}
-// ------------------------------------------
-// Calcule o1 op o2
-// Parametre d'entree:
-//	- o1, o2:	Valeur des operandes 1 et 2 sur 64 bit (32 bit + des 0)
-// Parametre de sortie:
-//	- res:	resultat du calcul sur 64 bits
-// ------------------------------------------
-uint64_t eor(uint32_t o0, uint32_t o1)
-{
-	uint64_t res = 0;
-	char i, b0, b1;
-
-	for (i=0; i<32; i++)
-	{
-		b0 = get_bit(o0, i);
-		b1 = get_bit(o1, i);
-		res |= (((b0 | b1) & ~(b0 & b1)) >> i);
-	}
-	return res;
 }

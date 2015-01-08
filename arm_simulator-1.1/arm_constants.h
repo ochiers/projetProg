@@ -44,8 +44,6 @@ Contact: Guillaume.Huard@imag.fr
 #define INTERRUPT               6
 #define FAST_INTERRUPT          7
 
-#define UNPREDICTABLE 8
-
 /* Some CPSR bits */
 #define N 31
 #define Z 30
@@ -70,7 +68,7 @@ Contact: Guillaume.Huard@imag.fr
 	Intructions class - Position 27-26*/
 #define ARITHMETICS_OPERATION	0
 #define LOAD_STORE_OPERATION	1
-#define BRANCH_OPERATION		2
+#define BRANCH_OPERATION	2
 
 /* Arithmetics Operations 
 	Position CodeOp 24-21 */

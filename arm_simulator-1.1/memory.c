@@ -34,7 +34,7 @@ Contact: Guillaume.Huard@imag.fr
 // ------------------------------------
 struct memory_data
 {
-	int8_t *address;
+	uint8_t *address;
 	size_t size;
 };
 
