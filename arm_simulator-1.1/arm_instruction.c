@@ -213,8 +213,9 @@ static int arm_execute_instruction(arm_core p) {
 	int condition, resultat = 1, type, categorie;
 	uint32_t instruction;
 	uint32_t cpsr;
+
 	resultat = arm_fetch(p, &instruction);
-	if(!resultat) {
+	if(resultat == -1) {
 		printf("erreur de fetch. %d\n", resultat);
 		return 0;
 	}
@@ -233,11 +234,11 @@ static int arm_execute_instruction(arm_core p) {
 				switch(type) {
 					case SHIFT_PROCESSING:
 						resultat = arm_data_processing_shift(p, instruction);
-						printf("arm_data_processing_shift");			
+						printf("arm_data_processing_shift\n");			
 						break;
 					case IMMEDIATE_PROCESSING:
 						resultat = arm_data_processing_immediate_msr(p, instruction);	
-						printf("arm_data_processing_immediate_msr");	
+						printf("arm_data_processing_immediate_msr\n");	
 						break;
 				}
 			break;
