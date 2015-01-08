@@ -86,7 +86,7 @@ uint32_t ror(uint32_t value, uint8_t rotation);
 // ------------------------------------------
 // Affiche la valeur de a en binaire sur nbrBit
 // ------------------------------------------
-	void printBin(uint32_t a, uint8_t nbrBit);
+	void printBin(uint32_t a, uint8_t nbrBit, char sl);
 
 int is_big_endian();
 #endif

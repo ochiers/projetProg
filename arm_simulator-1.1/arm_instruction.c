@@ -205,47 +205,47 @@ int sous_categorie_processing(uint32_t instruction) {
 	}
 	else if (!bit27 && !bit26 && bit25 && bit24 && !bit23 && bit21 && !bit20) { //ligne 8
 		resultat = IMMEDIATE_PROCESSING;
-	}	
+	}
 	return resultat;
 }
 ////////////////////////////////////////////////////////////////////////////////
 void affichage_condition(uint32_t instruction) {
 	uint32_t condition = (instruction >> 28);
-	printf("condition : ");
-	printBin(condition, 4);
-	printf(" -> ");
+	printf("\t- Condition\t\t: ");
+	printBin(condition, 4, 0);
+	printf("\t");
 	switch(condition) {
-		case 0000:
+		case 0:
 			printf("Z = 1\n");		break;
-		case 0001:
+		case 1:
 			printf("Z = 0\n");		break;
-		case 0010:
+		case 2:
 			printf("C = 1\n");		break;
-		case 0011:
+		case 3:
 			printf("C = 0\n");		break;
-		case 0100:
+		case 4:
 			printf("N = 1\n");		break;
-		case 0101:
+		case 5:
 			printf("N = 0\n");		break;
-		case 0110:
+		case 6:
 			printf("V = 1\n");		break;
-		case 0111:
+		case 7:
 			printf("V = 0\n");		break;
-		case 1000:
+		case 8:
 			printf("C = 1 && Z = 0\n");	break;
-		case 1001:
+		case 9:
 			printf("C = 0 && Z = 1\n");	break;
-		case 1010:
+		case 10:
 			printf("N = V\n");		break;
-		case 1011:
+		case 11:
 			printf("N != V\n");		break;
-		case 1100:
+		case 12:
 			printf("Z = 0 && N = V\n");	break;
-		case 1101:
+		case 13:
 			printf("Z = 1 || N != V\n");	break;
-		case 1110:
+		case 14:
 			printf("Always\n");		break;
-		case 1111:
+		case 15:
 			printf("miscellaneous\n");	break;
 	}
 }
@@ -254,29 +254,33 @@ void affichage_instruction(uint32_t instruction) {
 	uint32_t champ_categorie;
 	champ_categorie = instruction >> 25;
 	champ_categorie &= 0x7;
-	printf("instruction : ");
-	printBin(champ_categorie, 3);
+	printf("\t- Instruction\t\t: ");
+	printBin(champ_categorie, 3, 0);
+	printf("\t");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-static int arm_execute_instruction(arm_core p) {
+static int arm_execute_instruction(arm_core p)
+{
 	int condition, resultat = 1, type, categorie;
 	uint32_t instruction;
 	uint32_t cpsr;
+
 	resultat = arm_fetch(p, &instruction);
-	if(resultat == -1) {
+	if(resultat == -1)
+	{
 		printf("erreur de fetch. %d\n", resultat);
 		return 0;
 	}
-	
+	printf("\nInstruction:\t"); printBin(instruction, 32, 1);
 	affichage_condition(instruction);
 	affichage_instruction(instruction);
-	
+
 	condition = evaluer_condition(p, instruction);
 	categorie = evaluer_categorie(p, instruction);
     
 	if (!condition) {
-		printf("condition non respectée. \n");	
+		printf("***** Condition non respectée****** \n");	
 	}
 	else if (condition == 1) {
 		switch(categorie) {
@@ -284,12 +288,12 @@ static int arm_execute_instruction(arm_core p) {
 				type = sous_categorie_processing(instruction);
 				switch(type) {
 					case SHIFT_PROCESSING:
+						printf("arm_data_processing_shift\n");			
 						resultat = arm_data_processing_shift(p, instruction);
-						printf("arm_data_processing_shift");			
 						break;
 					case IMMEDIATE_PROCESSING:
 						resultat = arm_data_processing_immediate_msr(p, instruction);	
-						printf("arm_data_processing_immediate_msr");	
+						printf("arm_data_processing_immediate_msr\n");	
 						break;
 				}
 			break;
@@ -329,26 +333,31 @@ static int arm_execute_instruction(arm_core p) {
 		resultat = arm_miscellaneous(p, instruction);
 		printf("arm_miscellaneous\n");
 	}
-	cpsr = arm_read_cpsr(p);
-	printf("mode : ");
-	printBin((cpsr & 0xF), 4);
-	/*printf("T\t\n", (cpsr >> 5) & 0x1);
-	printf("F\t\n", (cpsr >> 6) & 0x1);
-	printf("I\t\n", (cpsr >> 7) & 0x1);
-	printf("A\t\n", (cpsr >> 8) & 0x1);
-	printf("E\t\n", (cpsr >> 9) & 0x1);
-	printf("GE\t\n", (cpsr >> 10) & 0x7);
-	printf("J\t\n", (cpsr >> 11) & 0x1); */
-	printf("NZCV : ");
-	printBin((cpsr >> 28), 4);
+	if (resultat == SUCCESS)
+	{
+		cpsr = arm_read_cpsr(p);
+		printf("\t- Resultat:\n");
+		printf("\t\t* Mode\t\t: ");	printBin((cpsr & 0xF), 4, 0); printf("\t%s\n", arm_get_mode_name(cpsr & 0xF));// %%%%%%%%%%%%%%%%%%%% Corigger la valeur de mode
+		printf("\t\t* NZCV\t\t: ");	printBin((cpsr >> 28), 4, 1);
+	}
 	return resultat;
 }
 ////////////////////////////////////////////////////////////////////////////////
-int arm_step(arm_core p) {
-	int result;
-	result = arm_execute_instruction(p);
-	if (result) {
+int arm_step(arm_core p)
+{
+	int result = arm_execute_instruction(p);
+	if (result > 0)					// Exception du processeur
+	{
 		arm_exception(p, result);
+	}
+	else if (result < 0)				// Exceptions personelles
+	{
+/*		switch (resultat)
+		{
+			case .....:	printf("\t- Instruction \n");
+			default: printf("*** Code exception non pris en charge ***\n");
+		}
+*/		result = SUCCESS;
 	}
 	return result;
 }

@@ -209,12 +209,14 @@ void readOperand(arm_core p, uint32_t ins, uint32_t *o0, uint32_t *o1, uint8_t *
 // ------------------------------------------
 void printInstrdataProcessingShift(uint8_t op, uint8_t S, uint8_t rn, uint8_t rd, uint32_t o0, uint32_t o1)
 {
-	printf("\t- opcode\t: ");	printBin(op, 4);
-	printf("\t- S\t\t: ");		printBin(S,  1);
-	printf("\t- Rn\t\t: %d\n", rn);
-	printf("\t- Rd\t\t: %d\n", rd);
-	printf("\t- Valeur o0:\t: %d\n", o0);
-	printf("\t- Valeur o1:\t: %d\n", o1);
+	printf("\t----------------------------------------\n");
+	printf("\t\t* opcode\t: ");		printBin(op, 4, 1);
+	printf("\t\t* S\t\t: ");		printBin(S,  1, 1);
+	printf("\t\t* Rn\t\t: %d\n", rn);
+	printf("\t\t* Rd\t\t: %d\n", rd);
+	printf("\t\t* Valeur o0:\t: %d\n", o0);
+	printf("\t\t* Valeur o1:\t: %d\n", o1);
+	printf("\t----------------------------------------\n");
 }
 // ------------------------------------------
 // Lit la valeur de l'opperande 1 et du shifter_carry dans le
