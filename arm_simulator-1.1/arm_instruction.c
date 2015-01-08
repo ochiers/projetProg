@@ -212,7 +212,7 @@ int sous_categorie_processing(uint32_t instruction) {
 static int arm_execute_instruction(arm_core p) {
 	int condition, resultat = 1, type, categorie;
 	uint32_t instruction;
-	uint32_t cpsr;	
+	uint32_t cpsr;
 	resultat = arm_fetch(p, &instruction);
 	if(!resultat) {
 		printf("erreur de fetch. %d\n", resultat);
@@ -288,7 +288,7 @@ static int arm_execute_instruction(arm_core p) {
 	printf("GE\t\n", (cpsr >> 10) & 0x7);
 	printf("J\t\n", (cpsr >> 11) & 0x1); */
 	printf("NZCV : ");
-	printBin((cpsr >> 28), 4);	
+	printBin((cpsr >> 28), 4);
 	return resultat;
 }
 ////////////////////////////////////////////////////////////////////////////////

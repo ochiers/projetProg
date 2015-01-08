@@ -111,3 +111,13 @@ uint8_t carryFrom(uint32_t a, uint32_t b, uint32_t c)
 
 	return (res > 0xFFFFFFFF);
 }
+// ------------------------------------------
+// Affiche la valeur de a en binaire sur nbrBit
+// ------------------------------------------
+void printBin(uint32_t a, uint8_t nbrBit)
+{
+	uint8_t i;
+
+	for (i=0; i<=0; i++)	printf("%d", get_bit(a, i));
+	printf("\n");
+}
