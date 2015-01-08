@@ -37,15 +37,21 @@ Contact: Guillaume.Huard@imag.fr
 
 void arm_exception(arm_core p, unsigned char exception)
 {
+	uint32_t cpsr = arm_readcpsr(p);
+
 	switch(exception)
 	{
 		case RESET:							// Semantics of reset interrupt (ARM manual A2-18)
 			arm_write_cpsr(p, 0x1d3 | Exception_bit_9);
 			arm_write_usr_register(p, PC_USER, 0);
 			break;
-/*#define RESET                   1
-#define UNDEFINED_INSTRUCTION   2
-#define SOFTWARE_INTERRUPT      3
+//%%%%%%%%%%%%%%%%%%%%%%% Tous  le reste doit etre en commentaire jusqu'au test de instruction
+/*		case UNDEFINED_INSTRUCTION:
+			
+			break;
+
+
+/*#define SOFTWARE_INTERRUPT      3
 #define PREFETCH_ABORT          4
 #define DATA_ABORT              5
 #define INTERRUPT               6
