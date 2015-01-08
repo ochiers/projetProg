@@ -21,7 +21,8 @@
 #include "arm_branch_other.h"
 #include "arm_constants.h"
 #include "util.h"
-#include <debug.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 /* Retourne 0 si la condition est mauvaise, 
@@ -76,7 +77,6 @@ int evaluer_condition(arm_core p, uint32_t instruction){
 		default:
 			flag_condition = 3; //Impossible car tout les mots appartiennent au codes
 	}
-	debug("condition : %x, %d\n", condition_courante, flag_condition);
 	return flag_condition;
 }
 
@@ -211,39 +211,55 @@ int sous_categorie_processing(uint32_t instruction) {
 ////////////////////////////////////////////////////////////////////////////////
 static int arm_execute_instruction(arm_core p) {
 	int condition, resultat = 1, type, categorie;
-	uint32_t instruction;	
+	uint32_t instruction;
+	uint32_t cpsr;
 	resultat = arm_fetch(p, &instruction);
 	if(!resultat) {
-		debug("erreur de fetch. %d\n", resultat);
+		printf("erreur de fetch. %d\n", resultat);
 		return 0;
 	}
+	printf("instruction : ");
+	printBin(instruction, 32);
 	condition = evaluer_condition(p, instruction);
 	categorie = evaluer_categorie(p, instruction);
+    
 	if (!condition) {
-		debug("condition non respecée.\n");	
+		printf("condition non respectée. \n");	
 	}
-	else {
+	else if (condition == 1) {
 		switch(categorie) {
 			case PROCESSING:
 				type = sous_categorie_processing(instruction);
 				switch(type) {
 					case SHIFT_PROCESSING:
-						resultat = arm_data_processing_shift(p, instruction);			break;
+						resultat = arm_data_processing_shift(p, instruction);
+						printf("arm_data_processing_shift");			
+						break;
 					case IMMEDIATE_PROCESSING:
-						resultat = arm_data_processing_immediate_msr(p, instruction);	break;
+						resultat = arm_data_processing_immediate_msr(p, instruction);	
+						printf("arm_data_processing_immediate_msr");	
+						break;
 				}
 			break;
 			case LOAD_STORE:
 				type = sous_categorie_load_store(instruction);
 				switch(type) {
 					case SIMPLE_LOAD_STORE:
-						resultat = arm_load_store(p, instruction);				break;
+						resultat = arm_load_store(p, instruction);				
+						printf("arm_load_store\n");
+						break;
 					case MULTIPLE_LOAD_STORE:
-						resultat = arm_load_store_multiple(p, instruction);		break;
+						resultat = arm_load_store_multiple(p, instruction);		
+						printf("arm_load_store_multiple\n");					
+						break;
 					case EXTRA_LOAD_STORE:
-						resultat = arm_load_store(p, instruction);				break;
+						resultat = arm_load_store(p, instruction);				
+						printf("arm_load_store\n");
+						break;
 					case COPROCESSOR_LOAD_STORE:
-						resultat = arm_coprocessor_load_store(p, instruction);	break;						
+						resultat = arm_coprocessor_load_store(p, instruction);	
+						printf("arm_coprocessor_load_store\n");
+						break;						
 				}
 			break;
 			/*case BRANCH_AUTRES:
@@ -257,6 +273,22 @@ static int arm_execute_instruction(arm_core p) {
 			break;
 		}
 	}
+	else if (condition == 2) {
+		resultat = arm_miscellaneous(p, instruction);
+		printf("arm_miscellaneous\n");
+	}
+	cpsr = arm_read_cpsr(p);
+	printf("mode : ");
+	printBin((cpsr & 0xF), 4);
+	/*printf("T\t\n", (cpsr >> 5) & 0x1);
+	printf("F\t\n", (cpsr >> 6) & 0x1);
+	printf("I\t\n", (cpsr >> 7) & 0x1);
+	printf("A\t\n", (cpsr >> 8) & 0x1);
+	printf("E\t\n", (cpsr >> 9) & 0x1);
+	printf("GE\t\n", (cpsr >> 10) & 0x7);
+	printf("J\t\n", (cpsr >> 11) & 0x1); */
+	printf("NZCV : ");
+	printBin((cpsr >> 28), 4);
 	return resultat;
 }
 ////////////////////////////////////////////////////////////////////////////////
