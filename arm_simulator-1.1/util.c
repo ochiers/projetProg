@@ -113,6 +113,7 @@ uint8_t carryFrom(uint32_t a, uint32_t b, uint32_t c)
 }
 // ------------------------------------------
 // Affiche la valeur de a en binaire sur nbrBit
+// sl: indique un saut de ligne
 // ------------------------------------------
 void printBin(uint32_t a, uint8_t nbrBit, char sl)
 {

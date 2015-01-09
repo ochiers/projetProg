@@ -57,5 +57,6 @@ void arm_exception(arm_core p, unsigned char exception)
 */		default:
 			printf("\n\n**** Traitement d'execption ****\n");
 			printf("**** Exception non geree: %d ****\n", exception);
+			exit(0);
 	}
 }

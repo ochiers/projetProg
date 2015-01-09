@@ -84,7 +84,7 @@ uint32_t ror(uint32_t value, uint8_t rotation);
 // ------------------------------------------
 	uint8_t carryFrom(uint32_t a, uint32_t b, uint32_t c);
 // ------------------------------------------
-// Affiche la valeur de a en binaire sur nbrBit
+// Affiche la valeur des nbrBit de poids faible en binaire
 // ------------------------------------------
 	void printBin(uint32_t a, uint8_t nbrBit, char sl);
 
