@@ -35,10 +35,10 @@ uint32_t scaledRegisterSwitch(arm_core p, uint8_t shift, uint8_t shift_imm, uint
 			index = contentRm << shift_imm;
 			break;
 		case 1 : /* LSR */
-			(shift_imm == 0) ? (index = 0) : (index = addressRn >> shift_imm);
+			(!shift_imm) ? (index = 0) : (index = addressRn >> shift_imm);
 			break;
 		case 2 : /* ASR */
-			if (shift_imm == 0) {
+			if (!shift_imm) {
 				if (get_bit(contentRm, 31))
 					index = 0xFFFFFFFF;
 			}
@@ -47,7 +47,7 @@ uint32_t scaledRegisterSwitch(arm_core p, uint8_t shift, uint8_t shift_imm, uint
 			break;
 		case 3 : 
 			/* ROR or RRX */		/* RRX */ 									/* ROR */
-			(shift_imm == 0) ? ((index = bitC << 31) || (contentRm >> 1)) : (index = ror(contentRm, shift_imm));
+			(!shift_imm) ? ((index = bitC << 31) || (contentRm >> 1)) : (index = ror(contentRm, shift_imm));
 			break;
 	}
 	return index;
@@ -68,8 +68,8 @@ int arm_load_store(arm_core p, uint32_t ins) {
 	uint8_t Rd = get_bits(ins, 16, 12);
 	uint8_t Rm = get_bits(ins, 4, 0);
 	
-	uint32_t addressRn = arm_read_register(p, Rn);	// Adresse de base, contenue dans Rn
-	uint32_t contentRm = arm_read_register(p, Rm);	// Offset contenu dans le registre Rm
+	uint32_t addressRn = arm_read_register(p, Rn);	/* Adresse de base, contenue dans Rn */
+	uint32_t contentRm = arm_read_register(p, Rm);	/* Offset contenu dans le registre Rm */
 	
 	uint8_t value8;
 	uint32_t value32;
@@ -109,64 +109,59 @@ int arm_load_store(arm_core p, uint32_t ins) {
 	printf("	- contentRm : %d\n", contentRm);
 	printf("	- contentRd : %d\n", contentRm);
 	
-	if(M == 1 && Rm !=15 && Rn != Rm) { // Load/Store simple
+	if(M && Rm !=15 && Rn != Rm) { /* Load/Store simple */
 	printf("	........................................ Load/Store Simple ........................................\n");
-		if (!I && P) {
+		if (!I && P) { /* Immediate Offset, ARM-Doc p.460 */
+//	printf("Immediate Offset ------------------------------------------------------------------------------------- \n");
 			(U) ? (address = addressRn + offset12) : (address = contentRm - offset12);
-		
-			if (W)
+			if (W) /* Immediate Pre-indexed, ARM-Doc p.464 */
 				arm_write_register(p, Rn, address);
 		}
-		else if (I && P && shifter == 0) {
+		else if (I && P && !shifter) { /* Register Offset, ARM-Doc p.461 */
+//	printf("Register Offset ------------------------------------------------------------------------------------- \n");
 			(U) ? (address = addressRn + contentRm) : (address = addressRn - contentRm);
-			
-			if (W)
+			if (W) /* Register Pre-indexed, ARM-Doc p.465 */
 				arm_write_register(p, Rn, address);                                 
 		}
-		else if (I && P) {
-		
+		else if (I && P) { /* Scaled Register Offset, ARM-Doc p.463 */
+//	printf("Scaled Register ------------------------------------------------------------------------------------- \n");
 			index = scaledRegisterSwitch(p, shift, shift_imm, addressRn, contentRm);
-			
 			(U) ? (address = addressRn + index) : (address = addressRn - index);
-			
-			if (W)
+			if (W) /* Scaled Register Pre-indexed, ARM-Doc p.466 */
 				arm_write_register(p, Rn, address);
 		}
-		else if (I && !P && !W && shifter == 0) {
+		else if (I && !P && !W && !shifter) { /* Register Post-indexed, ARM-Doc p.470 */
+//	printf("Register Post-indexed ------------------------------------------------------------------------------------- \n");
 			address = addressRn;
 			(U) ? (arm_write_register(p, Rn, addressRn + contentRm)) : (arm_write_register(p, Rn, addressRn - contentRm));
 		}
-		else if (I && !P && !W) {
+		else if (I && !P && !W) { /* Scaled Register Post-indexed, ARM-Doc p.460 */
 			address = addressRn;
-			
 			index = scaledRegisterSwitch(p, shift, shift_imm, addressRn, contentRm);
-			
 			(U) ? (arm_write_register(p, Rn, addressRn + index)) : (arm_write_register(p, Rn, addressRn - index));
 		}
-		else if (!I && !P && !W) {
+		else if (!I && !P && !W) { /* Immediate Post-indexed, ARM-Doc p.468 */
 			address = addressRn;
-			
 			(U) ? (arm_write_register(p, Rn, addressRn + offset12)) : (arm_write_register(p, Rn, addressRn - offset12));	
 		}
 		else return UNDEFINED_INSTRUCTION;
 		
-		if(L) { // Load
+		if(L) { /* Load */
 		printf("			------------ Load ------------\n");
 			if (B) {
 				result = arm_read_byte(p, address, &value8);
 				arm_write_register(p, Rd, value8);
-				printf("		- value8 : %d\n", value8);
+//				printf("		- value8 : %d\n", value8);
 			}
 			else {
 				result = arm_read_word(p, address, &value32);
 				arm_write_register(p, Rd, value32);
-				printf("		- value32 : %d\n", value32);
+//				printf("		- value32 : %d\n", value32);
 			}
 		}
-		else { // Store
+		else { /* Store */
 		printf("			------------ Store ------------\n");
 			(B) ? (arm_write_byte(p, address, (uint8_t) contentRd)) : (arm_write_word(p, address, contentRd)) ;
-			printf("		- contentRd : %d\n", contentRd);
 		}
 		
 	}
@@ -218,31 +213,26 @@ int arm_load_store(arm_core p, uint32_t ins) {
 			arm_write_register(p, Rd, value16);
 		}
 	}
-	else {
-		printf("------------ Else ------------\n");
-		return UNDEFINED_INSTRUCTION;
+	else return UNDEFINED_INSTRUCTION;
+	
+	if (M && !B && L) { /* LDR */
+		printf("................. LDR\n");
 	}
-	
-	
-	if (I && !B && L) { /* LDR */
-		
+	else if (M && B && L) { /* LDRB */
+		printf("................. LDRB\n");
 	}
-	else if (I && B && L) { /* LDRB */
-	
+	else if (!M && !I && L) { /* LDRH */
+		printf("................. LDRH\n");
 	}
-	else if (!I && L) { /* LDRH */
-	
+	else if (M && !B && !L) { /* STR */
+		printf("................. STR\n");
 	}
-	else if (I && !B && !L) { /* STR */
-	
+	else if (M && B && !L) { /* STRB */
+		printf("................. STRB\n");
 	}
-	else if (I && B && !L) { /* STRB */
-	
+	else if (!M && !I && !L) { /* STRH */
+		printf("................. STRH\n");
 	}
-	else if (!I && !L) { /* STRH */
-	
-	}
-	
 	
     return result;
 }
