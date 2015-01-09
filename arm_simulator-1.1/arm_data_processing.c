@@ -37,66 +37,79 @@ int arm_data_processing_shift(arm_core p, uint32_t ins)
 	switch(op)										// Executer l'instruction
 	{
 		case INSTR_AND:	res = o0 & o1;
+				printf("\tAND\n");
 				if (shifter_carry_out)		cpsr = set_bit(cpsr, CPSR_C);
 				else				cpsr = clr_bit(cpsr, CPSR_C);
 				break;
 		case INSTR_EOR:	res = eor(o0, o1);
+				printf("\tEOR\n");
 				if (shifter_carry_out)		cpsr = set_bit(cpsr, CPSR_C);
 				else				cpsr = clr_bit(cpsr, CPSR_C);
 				break;
 		case INSTR_SUB:	res = o0 - o1;
+				printf("\tSUB\n");
 				if (borrowFrom(o0, o1, 0))	cpsr = clr_bit(cpsr, CPSR_C);
 				else				cpsr = set_bit(cpsr, CPSR_C);
 				if (overflowFromSub(o0, o1, 0))	cpsr = set_bit(cpsr, CPSR_V);
 				else				cpsr = set_bit(cpsr, CPSR_V);
 				break;
 		case INSTR_RSB:	res = o1 - o0;
+				printf("\tRSB\n");
 				if (borrowFrom(o1, o0, 0))	cpsr = clr_bit(cpsr, CPSR_C);
 				else				cpsr = set_bit(cpsr, CPSR_C);
 				if (overflowFromSub(o1, o0, 0))	cpsr = set_bit(cpsr, CPSR_V);
 				else				cpsr = set_bit(cpsr, CPSR_V);
 				break;
 		case INSTR_ADD:	res = o0 + o1;
+				printf("\tADD\n");
 				if (carryFrom(o0, o1, 0))	cpsr = clr_bit(cpsr, CPSR_C);
 				else				cpsr = set_bit(cpsr, CPSR_C);
 				if (overflowFromAdd(o0, o1, 0))	cpsr = set_bit(cpsr, CPSR_V);
 				else				cpsr = set_bit(cpsr, CPSR_V);
 				break;
 		case INSTR_ADC:	res = o0 + o1 + cflag;
+				printf("\tADC\n");
 				if (carryFrom(o0, o1, cflag))	cpsr = clr_bit(cpsr, CPSR_C);
 				else				cpsr = set_bit(cpsr, CPSR_C);
 				if (overflowFromAdd(o0, o1, cflag))cpsr = set_bit(cpsr, CPSR_V);
 				else				cpsr = set_bit(cpsr, CPSR_V);
 				break;
 		case INSTR_SBC:	res = o0 - o1 - ncflag;
+				printf("\tSBC\n");
 				if (borrowFrom(o0, o1, ncflag))	cpsr = clr_bit(cpsr, CPSR_C);
 				else				cpsr = set_bit(cpsr, CPSR_C);
 				if (overflowFromSub(o0, o1, ncflag))cpsr = set_bit(cpsr, CPSR_V);
 				else				cpsr = set_bit(cpsr, CPSR_V);
 				break;
 		case INSTR_RSC:	res = o1 - o0 - ncflag;
+				printf("\tRSC\n");
 				if (borrowFrom(o1, o0, ncflag))	cpsr = clr_bit(cpsr, CPSR_C);
 				else				cpsr = set_bit(cpsr, CPSR_C);
 				if (overflowFromSub(o1, o0, ncflag))cpsr = set_bit(cpsr, CPSR_V);
 				else				cpsr = set_bit(cpsr, CPSR_V);
 				break;
 		case INSTR_ORR:	res = o0 | o1;
+				printf("\tORR\n");
 				if (shifter_carry_out)		cpsr = set_bit(cpsr, CPSR_C);
 				else				cpsr = clr_bit(cpsr, CPSR_C);
 				break;
 		case INSTR_MOV:	res = o1;
+				printf("\tMOV\n");
 				if (shifter_carry_out)		cpsr = set_bit(cpsr, CPSR_C);
 				else				cpsr = clr_bit(cpsr, CPSR_C);
 				break;
 		case INSTR_BIC:	res = o0 & (~o1);
+				printf("\tBIC\n");
 				if (shifter_carry_out)		cpsr = set_bit(cpsr, CPSR_C);
 				else				cpsr = clr_bit(cpsr, CPSR_C);
 				break;
 		case INSTR_MVN:	res = ~o1;
+				printf("\tMVN\n");
 				if (shifter_carry_out)		cpsr = set_bit(cpsr, CPSR_C);
 				else				cpsr = clr_bit(cpsr, CPSR_C);
 				break;
 		case INSTR_TST:	if (S == 0)	return UNDEFINED_INSTRUCTION;
+				printf("\tTST\n");
 				res = o0 & o1;
 				if (get_bit(res, 31))		cpsr = set_bit(cpsr, CPSR_N);
 				else				cpsr = clr_bit(cpsr, CPSR_N);
@@ -107,6 +120,7 @@ int arm_data_processing_shift(arm_core p, uint32_t ins)
 				arm_write_cpsr(p, cpsr);
 				return SUCCESS;
 		case INSTR_TEQ:	if (S == 0)	return UNDEFINED_INSTRUCTION;
+				printf("\tTEQ\n");
 				res = eor(o0, o1);
 				if (get_bit(res, 31))		cpsr = set_bit(cpsr, CPSR_N);
 				else				cpsr = clr_bit(cpsr, CPSR_N);
@@ -117,6 +131,7 @@ int arm_data_processing_shift(arm_core p, uint32_t ins)
 				arm_write_cpsr(p, cpsr);
 				return SUCCESS;
 		case INSTR_CMP:	if (S == 0)	return UNDEFINED_INSTRUCTION;
+				printf("\tCMP\n");
 				res = o0 - o1;
 				if (get_bit(res, 31))		cpsr = set_bit(cpsr, CPSR_N);
 				else				cpsr = clr_bit(cpsr, CPSR_N);
@@ -129,6 +144,7 @@ int arm_data_processing_shift(arm_core p, uint32_t ins)
 				arm_write_cpsr(p, cpsr);
 				return SUCCESS;
 		case INSTR_CMN:	if (S == 0)	return UNDEFINED_INSTRUCTION;
+				printf("\tCMN\n");
 				res = o0 + o1;
 				if (get_bit(res, 31))		cpsr = set_bit(cpsr, CPSR_N);
 				else				cpsr = clr_bit(cpsr, CPSR_N);
@@ -140,9 +156,13 @@ int arm_data_processing_shift(arm_core p, uint32_t ins)
 				else				cpsr = clr_bit(cpsr, CPSR_V);
 				arm_write_cpsr(p, cpsr);
 				return SUCCESS;
-		default:	return UNDEFINED_INSTRUCTION;
+		default:
+				printf("\tNON RECONNUE\n");
+				return UNDEFINED_INSTRUCTION;
 	}
 	arm_write_register(p, rd, res);								// Ecriture du resultat
+	printf("\t\t* Valeur res:\t: %d\n", res);
+	printf("\t----------------------------------------\n");
 	if (S)											// Mise a jour du cpsr
 	{
 		if (rd == 15)									//	Cas d'un changement de pc
@@ -210,13 +230,12 @@ void readOperand(arm_core p, uint32_t ins, uint32_t *o0, uint32_t *o1, uint8_t *
 void printInstrdataProcessingShift(uint8_t op, uint8_t S, uint8_t rn, uint8_t rd, uint32_t o0, uint32_t o1)
 {
 	printf("\t----------------------------------------\n");
-	printf("\t\t* opcode\t: ");		printBin(op, 4, 1);
 	printf("\t\t* S\t\t: ");		printBin(S,  1, 1);
 	printf("\t\t* Rn\t\t: %d\n", rn);
 	printf("\t\t* Rd\t\t: %d\n", rd);
 	printf("\t\t* Valeur o0:\t: %d\n", o0);
 	printf("\t\t* Valeur o1:\t: %d\n", o1);
-	printf("\t----------------------------------------\n");
+	printf("\t\t* opcode\t: ");		printBin(op, 4, 0);
 }
 // ------------------------------------------
 // Lit la valeur de l'opperande 1 et du shifter_carry dans le

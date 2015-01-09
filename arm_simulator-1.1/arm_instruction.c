@@ -1,19 +1,3 @@
-#define PC_USER 15
-
-#define PROCESSING 1 
-#define	LOAD_STORE 2
-#define	BRANCH_AUTRES 3 
-#define	NON_ENCORE_TRAITE 4
-#define	ERREUR 0
-
-#define SIMPLE_LOAD_STORE 0
-#define MULTIPLE_LOAD_STORE 1
-#define COPROCESSOR_LOAD_STORE 2
-#define EXTRA_LOAD_STORE 3
-
-#define SHIFT_PROCESSING 0
-#define IMMEDIATE_PROCESSING 1
-
 #include "arm_instruction.h"
 #include "arm_exception.h"
 #include "arm_data_processing.h"
@@ -23,6 +7,31 @@
 #include "util.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+#define PC_USER			15
+
+#define PROCESSING_SHIFT	1 
+#define PROCESSING_IMM_MSR	2 
+#define	LOAD_STORE		3
+#define MISCELLANEOUS		4
+#define	BRANCH			5
+#define	MULTIPLIE		6
+#define	SWI			7
+#define	NON_ENCORE_TRAITE	8
+#define	ERREUR			0
+
+#define SIMPLE_LOAD_STORE	0
+#define MULTIPLE_LOAD_STORE	1
+#define COPROCESSOR_LOAD_STORE	2
+#define EXTRA_LOAD_STORE	3
+
+
+
+
+
+
+
+
 
 
 
@@ -72,11 +81,15 @@ int evaluer_condition(arm_core p, uint32_t instruction)
 	return flag_condition;
 }
 //---------------------------------------------------
-// Retourne	1: PROCESSING
-//		2: LOAD_STORE
-//		3: BRANCH_AUTRES
-//		4: NON_ENCORE_TRAITE
-//		0: ERREUR 0
+// Retourne	PROCESSING_SHIFT	1 
+//		PROCESSING_IMM_MSR	2 
+//		LOAD_STORE		3
+//		MISCELLANEOUS		4
+//		BRANCH			5
+//		NON_ENCORE_TRAITE	6
+//		SWI			7
+//		MULTIPLIE		8
+//		ERREUR			0
 //---------------------------------------------------
 int evaluer_categorie(arm_core p, uint32_t instruction)
 {
@@ -96,15 +109,16 @@ int evaluer_categorie(arm_core p, uint32_t instruction)
 	switch(champ_categorie)
 	{
 		case 0:
-			if	(bit24 && !bit23 && !bit20 && !bit4)		categorie = BRANCH_AUTRES;	//ligne 2
-			else if (!bit4 || (bit4 && !bit7))			categorie = PROCESSING;		//ligne 1 & 3
-			else if (bit24 && !bit23 && !bit20 && !bit7 && bit4)	categorie = BRANCH_AUTRES;	//ligne 4
-			else if (bit7 && !bit6 && !bit5 && bit4)		categorie = NON_ENCORE_TRAITE;	//ligne 5, Multiplies
+			if	(bit24 && !bit23 && !bit20 && !bit4)		categorie = MISCELLANEOUS;	//ligne 2
+			else if (!bit4 || (bit4 && !bit7))			categorie = PROCESSING_SHIFT;	//ligne 1 & 3
+			else if (bit24 && !bit23 && !bit20 && !bit7 && bit4)	categorie = MISCELLANEOUS;	//ligne 4
+			else if (bit7 && !bit6 && !bit5 && bit4)		categorie = MULTIPLIE;		//ligne 5
 			else if (bit7 && !(!bit6 && !bit5) && bit4)		categorie = LOAD_STORE;		//ligne 5.5, Extra load/store
 			break;
 		case 1:
-			if (bit24 && !bit23 && !bit21 && !bit20)		categorie = ERREUR;		//ligne 7
-			else 							categorie = PROCESSING;		//ligne 6 & 8
+			if	(bit24 && !bit23 && !bit21 && !bit20)		categorie = ERREUR;		//ligne 7
+			else if (bit24 && !bit23 && bit21 && !bit20)		categorie = PROCESSING_IMM_MSR;	//ligne 8
+			else							categorie = PROCESSING_SHIFT;	//ligne 6
 			break;
 		case 2:								categorie = LOAD_STORE;		//ligne 9
 			break; 
@@ -115,23 +129,28 @@ int evaluer_categorie(arm_core p, uint32_t instruction)
 		case 4:								categorie = LOAD_STORE;		//ligne 13
 			break; 
 		case 5:
-										categorie = BRANCH_AUTRES;	//ligne 14
+										categorie = BRANCH;		//ligne 14
 			break;
 		case 6:
 										categorie = NON_ENCORE_TRAITE;	//ligne 15
 			break; 
+		case 7:
+			if (bit24)						categorie = SWI;		//ligne 18
+			else							categorie = NON_ENCORE_TRAITE;	//ligne 16, 17
+			break; 
+		default:
+										categorie = NON_ENCORE_TRAITE;	//ligne 16, 17, 18
 	}
-	return categorie;	
+	return categorie;
 }
 //---------------------------------------------------
 // Retourne	0: SIMPLE_LOAD_STORE
 //		1: MULTIPLE_LOAD_STORE
 //		2: COPROCESSOR_LOAD_STORE
 //		3: EXTRA_LOAD_STORE
-----------------------
+//---------------------------------------------------
 int sous_categorie_load_store(uint32_t instruction)
 {
-	uint32_t champ_categorie = (instruction >> 25) & 0x7;
 	int resultat = -1;
 	uint32_t bit4, bit5, bit6, bit7, bit25, bit26, bit27;
 
@@ -147,36 +166,6 @@ int sous_categorie_load_store(uint32_t instruction)
 	else if	(!bit27 && bit26 && !bit25)						resultat = SIMPLE_LOAD_STORE;	//ligne 9
 	else if	(!bit27 && bit26 && bit25)						resultat = SIMPLE_LOAD_STORE;	//ligne 10
 	else if (bit27 && !bit26 && !bit25)						resultat = MULTIPLE_LOAD_STORE;	//ligne 13
-	return resultat;
-}
-////////////////////////////////////////////////////////////////////////////////
-int sous_categorie_processing(uint32_t instruction) {
-	uint32_t champ_categorie;
-	champ_categorie = instruction >> 25;
-	champ_categorie &= 0x7;
-	int resultat = -1;
-	uint32_t bit4, bit7, bit20, bit21, bit23, bit24, bit25, bit26, bit27;
-	bit4 = get_bit(instruction, 4);
-	bit7 = get_bit(instruction, 7);
-	bit20 = get_bit(instruction, 20);
-	bit21 = get_bit(instruction, 21);
-	bit23 = get_bit(instruction, 23);	
-	bit24 = get_bit(instruction, 24);	
-	bit25 = get_bit(instruction, 25);
-	bit26 = get_bit(instruction, 26);
-	bit27 = get_bit(instruction, 27);
-	if (!bit27 && !bit26 && !bit25 && !bit4) { //ligne 1
-		resultat = SHIFT_PROCESSING;
-	}
-	else if (!bit27 && !bit26 && !bit25 && !bit7 && bit4) { //ligne 3
-		resultat = SHIFT_PROCESSING;
-	}
-	else if (!bit27 && !bit26 && bit25) { //ligne 6
-		resultat = SHIFT_PROCESSING;
-	}
-	else if (!bit27 && !bit26 && bit25 && bit24 && !bit23 && bit21 && !bit20) { //ligne 8
-		resultat = IMMEDIATE_PROCESSING;
-	}
 	return resultat;
 }
 // ------------------------------------------------------
@@ -199,7 +188,7 @@ void affichage_condition(uint32_t instruction)
 		case 7:	printf("V = 0\n");		break;
 		case 8:	printf("C = 1 && Z = 0\n");	break;
 		case 9:	printf("C = 0 && Z = 1\n");	break;
-		case 10	printf("N = V\n");		break;
+		case 10:printf("N = V\n");		break;
 		case 11:printf("N != V\n");		break;
 		case 12:printf("Z = 0 && N = V\n");	break;
 		case 13:printf("Z = 1 || N != V\n");	break;
@@ -207,7 +196,9 @@ void affichage_condition(uint32_t instruction)
 		case 15:printf("miscellaneous\n");	break;
 	}
 }
-////////////////////////////////////////////////////////////////////////////////
+// ------------------------------------------
+// Execute une instruction
+// ------------------------------------------
 static int arm_execute_instruction(arm_core p)
 {
 	int condition, resultat = 1, type, categorie;
@@ -234,23 +225,18 @@ static int arm_execute_instruction(arm_core p)
 	{
 		switch(categorie)
 		{
-			case PROCESSING:
-				type = sous_categorie_processing(instruction);
-				switch(type)
-				{
-					case SHIFT_PROCESSING:
-						printf("arm_data_processing_shift\n");			
-						resultat = arm_data_processing_shift(p, instruction);
-						break;
-					case IMMEDIATE_PROCESSING:
-						printf("arm_data_processing_immediate_msr\n");	
-						resultat = arm_data_processing_immediate_msr(p, instruction);	
-						break;
-				}
-			break;
+			case PROCESSING_SHIFT:
+				printf("arm_data_processing_shift\n");			
+				resultat = arm_data_processing_shift(p, instruction);
+				break;
+			case PROCESSING_IMM_MSR:
+				printf("arm_data_processing_immediate_msr\n");	
+				resultat = arm_data_processing_immediate_msr(p, instruction);	
+				break;
 			case LOAD_STORE:
 				type = sous_categorie_load_store(instruction);
-				switch(type) {
+				switch(type)
+				{
 					case SIMPLE_LOAD_STORE:
 						printf("arm_load_store\n");
 						resultat = arm_load_store(p, instruction);				
@@ -269,15 +255,29 @@ static int arm_execute_instruction(arm_core p)
 						break;						
 				}
 			break;
-			/*case BRANCH_AUTRES:
+			case BRANCH:
+				printf("arm_branch\n");
+				resultat = arm_branch(p, instruction);	
+				break;
+			case MISCELLANEOUS:
+				printf("arm_miscellaneous\n");
+				resultat = arm_miscellaneous(p, instruction);	
+				break;
+/*			case MULTIPLIE:
 				type = sous_categorie_branch_autres(instruction);
 				switch(type){
 					non implementé
 				}
-			break; */
-			case NON_ENCORE_TRAITE:
-				resultat = 1;
-			break;
+				break;
+			
+
+*/			case SWI:
+				printf("arm_coprocessor_others_swi\n");
+				resultat = arm_coprocessor_others_swi(p, instruction);
+				break;
+			case NON_ENCORE_TRAITE:	resultat = UNIMPLEMENTED_INSTRUCTION;				break;
+			case ERREUR:		resultat = UNDEFINED_INSTRUCTION;				break;
+
 		}
 	}
 	else if (condition == 2)
@@ -289,12 +289,13 @@ static int arm_execute_instruction(arm_core p)
 	{
 		cpsr = arm_read_cpsr(p);
 		printf("\t- Resultat:\n");
-		printf("\t\t* Mode\t\t: ");	printBin((cpsr & 0xF), 4, 0); printf("\t%s\n", arm_get_mode_name(cpsr & 0xF));// %%%%%%%%%%%%%%%%%%%% Corigger la valeur de mode
+		printf("\t\t* Mode\t\t: ");	printBin((cpsr & 0xF), 4, 0); printf("\t%s\n", arm_get_mode_name(cpsr & 0xF));// %%%%%%%%%%%%%%%%%%%% Corriger la valeur de mode
 		printf("\t\t* NZCV\t\t: ");	printBin((cpsr >> 28), 4, 1);
 	}
 	return resultat;
 }
 // ------------------------------------------
+// Fonction principale
 // Execute une instruction
 // ------------------------------------------
 int arm_step(arm_core p)
@@ -308,11 +309,10 @@ int arm_step(arm_core p)
 	{
 		switch (result)
 		{
-			case UNIMPLEMENTED_INSTRUCTION:	printf("\t- Instruction \n");	break
+			case UNIMPLEMENTED_INSTRUCTION:	printf("\t- Instruction \n");	break;
 			default: printf("*** Code exception non pris en charge ***\n");
 		}
 		result = SUCCESS;
 	}
 	return result;
 }
-////////////////////////////////////////////////////////////////////////////////
