@@ -15,6 +15,7 @@ temps que ce programme ; si ce n'est pas le cas, écrivez à la Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307,
 États-Unis.
 
+
 Contact: Guillaume.Huard@imag.fr
          ENSIMAG - Laboratoire LIG
          51 avenue Jean Kuntzmann
@@ -27,6 +28,11 @@ Contact: Guillaume.Huard@imag.fr
 
 int arm_branch(arm_core p, uint32_t ins);
 
+int arm_mrs(arm_core p, uint32_t ins);
+
+/* move immediate to status register*/
+int arm_msr(arm_core p, uint32_t ins);
+
 //!!! L'utilisation de BLX avec un registre contenant une adresse impaire fait passer au jeu d'instruction Thumb
 // Cette fonctionnalité n'étant (pas encore ;) implémenter,
 // BLX NE DOIT ETRE APPELÉ QUE SUR DES REGISTRES CONTENANT DES ADRESSES PAIRES
@@ -37,7 +43,7 @@ int arm_miscellaneous(arm_core p, uint32_t ins);
 uint32_t lecture_entier_immediat_signe_24bits(uint32_t instruction);
 
 void print_information_instruction_B_BL(arm_core p,	uint32_t instruction);
-
+void print_information_instruction_BLX(arm_core p,	uint32_t instruction);
 
 
 #endif
