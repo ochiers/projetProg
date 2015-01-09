@@ -96,14 +96,14 @@ int evaluer_categorie(arm_core p, uint32_t instruction) {
 		case 0:
 			if	(bit24 && !bit23 && !bit20 && !bit4)		
 				categorie = MISCELLANEOUS;		//ligne 2
-			else if (!bit4 || (bit4 && !bit7))			
-				categorie = PROCESSING_SHIFT;	//ligne 1 & 3
 			else if (bit24 && !bit23 && !bit20 && !bit7 && bit4)	
 				categorie = MISCELLANEOUS;		//ligne 4
 			else if (bit7 && !bit6 && !bit5 && bit4)		
 				categorie = MULTIPLIE;			//ligne 5
 			else if (bit7 && !(!bit6 && !bit5) && bit4)		
 				categorie = LOAD_STORE;			//ligne 5.5, Extra load/store
+			else if (!bit4 || (bit4 && !bit7))			
+				categorie = PROCESSING_SHIFT;	//ligne 1 & 3
 			break;
 		case 1:
 			if	(bit24 && !bit23 && !bit21 && !bit20)		
