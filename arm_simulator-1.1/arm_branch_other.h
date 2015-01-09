@@ -31,7 +31,8 @@ int arm_branch(arm_core p, uint32_t ins);
 int arm_mrs(arm_core p, uint32_t ins);
 
 /* move immediate to status register*/
-int arm_msr(arm_core p, uint32_t ins);
+int arm_msr_immediate_operand(arm_core p, uint32_t ins);
+int arm_msr_register_operand(arm_core p, uint32_t ins);
 
 //!!! L'utilisation de BLX avec un registre contenant une adresse impaire fait passer au jeu d'instruction Thumb
 // Cette fonctionnalité n'étant (pas encore ;) implémenter,

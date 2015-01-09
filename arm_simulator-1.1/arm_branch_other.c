@@ -52,6 +52,55 @@ int arm_branch(arm_core p, uint32_t ins) {
 	return SUCCESS;
 }	
 
+
+int arm_miscellaneous(arm_core p, uint32_t ins) {
+    uint32_t  bits27_20=get_bits(ins, 28, 20);
+	uint32_t  bits7_4=get_bits(ins, 8, 4);
+	
+	uint32_t champ_27a23=get_bits(ins, 28, 23);
+	uint32_t champ_21a20=get_bits(ins, 22, 20); 
+
+	if( (bits27_20==18) && (bits7_4==3) ) { //respectivement 00010010 et 0011 BLX
+		return arm_branch_X( p, ins );
+	}else if ( champ_27a23==2 && champ_21a20==0 ) {
+		return arm_mrs( p, ins);
+	}else if ( champ_27a23==6 && champ_21a20==2 ) {
+		return arm_msr_immediate_operand( p, ins );
+	}else if ( champ_27a23==2 && champ_21a20==2 && bits7_4==0 ) {
+		return arm_msr_register_operand( p, ins);
+	}else{
+		return UNDEFINED_INSTRUCTION;
+	}
+}
+
+
+int arm_coprocessor_others_swi(arm_core p, uint32_t ins) {
+    if (get_bit(ins, 24)) {
+        /* Here we implement the end of the simulation as swi 0x123456 */
+        if ((ins & 0xFFFFFF) == 0x123456)
+            exit(0);
+        return SOFTWARE_INTERRUPT;
+    } 
+    return UNDEFINED_INSTRUCTION;
+}
+
+
+
+
+int arm_msr_immediate_operand(arm_core p, uint32_t ins){
+	return UNIMPLEMENTED_INSTRUCTION;
+}
+int arm_msr_register_operand(arm_core p, uint32_t ins){
+	return UNIMPLEMENTED_INSTRUCTION;
+}
+int arm_mrs(arm_core p, uint32_t ins){
+	return UNIMPLEMENTED_INSTRUCTION;
+}
+
+
+
+
+
 /* Implémentation de l'instruction BLX: branchement à l'adresse contenue dans un registre
 Attention !!! BLX vers une addresse impaire enclenche le jeu d'instruction Thumb
 Cette partie du processeur n'est pas simulé, option non disponible */
@@ -87,29 +136,6 @@ int arm_branch_X(arm_core p, uint32_t ins){
 		return SUCCESS;	
 		
 }
-
-int arm_coprocessor_others_swi(arm_core p, uint32_t ins) {
-    if (get_bit(ins, 24)) {
-        /* Here we implement the end of the simulation as swi 0x123456 */
-        if ((ins & 0xFFFFFF) == 0x123456)
-            exit(0);
-        return SOFTWARE_INTERRUPT;
-    } 
-    return UNDEFINED_INSTRUCTION;
-}
-
-int arm_miscellaneous(arm_core p, uint32_t ins) {
-    int bits27_20=get_bits(ins, 28, 20);
-	int bits7_4=get_bits(ins, 8, 4);
-	
-	if( (bits27_20==18) && (bits7_4==3) ) { //respectivement 00010010 et 0011 BLX
-		return arm_branch_X( p, ins );
-	}else{
-		return UNDEFINED_INSTRUCTION;
-	}
-}
-
-
 
 
 
