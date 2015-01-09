@@ -179,21 +179,21 @@ void affichage_condition(uint32_t instruction) {
 
 	printf("\t- Condition\t\t: ");	printBin(condition, 4, 0);printf("\t");
 	switch (condition) {
-		case 0:	printf("Z = 1\n");		break;
-		case 1:	printf("Z = 0\n");		break;
-		case 2:	printf("C = 1\n");		break;
-		case 3:	printf("C = 0\n");		break;
-		case 4:	printf("N = 1\n");		break;
-		case 5:	printf("N = 0\n");		break;
-		case 6:	printf("V = 1\n");		break;
-		case 7:	printf("V = 0\n");		break;
+		case 0:	printf("Z = 1\n");			break;
+		case 1:	printf("Z = 0\n");			break;
+		case 2:	printf("C = 1\n");			break;
+		case 3:	printf("C = 0\n");			break;
+		case 4:	printf("N = 1\n");			break;
+		case 5:	printf("N = 0\n");			break;
+		case 6:	printf("V = 1\n");			break;
+		case 7:	printf("V = 0\n");			break;
 		case 8:	printf("C = 1 && Z = 0\n");	break;
 		case 9:	printf("C = 0 && Z = 1\n");	break;
-		case 10:printf("N = V\n");		break;
-		case 11:printf("N != V\n");		break;
+		case 10:printf("N = V\n");			break;
+		case 11:printf("N != V\n");			break;
 		case 12:printf("Z = 0 && N = V\n");	break;
-		case 13:printf("Z = 1 || N != V\n");	break;
-		case 14:printf("Always\n");		break;
+		case 13:printf("Z = 1 || N != V\n");break;
+		case 14:printf("Always\n");			break;
 		case 15:printf("miscellaneous\n");	break;
 	}
 }
