@@ -94,9 +94,22 @@ int arm_load_store(arm_core p, uint32_t ins) {
 	uint8_t offset8 = 0;
 	
 	uint16_t value16;
+	printf("ARM_LOAD_STORE ...........................................\n");
+	printf("	- M : %d\n", M);
+	printf("	- I : %d\n", I);
+	printf("	- P : %d\n", P);
+	printf("	- U : %d\n", U);
+	printf("	- B : %d\n", B);
+	printf("	- W : %d\n", W);
+	printf("	- L : %d\n", L);
+	printf("	- Rn : %d\n", Rn);
+	printf("	- Rd : %d\n", Rd);
+	printf("	- Rm : %d\n", Rm);
+	printf("	- addressRn : %d\n", addressRn);
+	printf("	- contentRm : %d\n", contentRm);
 	
-	if(M && Rn != 15 && Rm !=15 && Rn != Rm) { // Load/Store simple
-	
+	if(M == 1 && Rm !=15 && Rn != Rm) { // Load/Store simple
+	printf("Load/Store Simple ........................................\n");
 		if (!I && P) {
 			(U) ? (address = addressRn + offset12) : (address = contentRm - offset12);
 		
@@ -137,7 +150,7 @@ int arm_load_store(arm_core p, uint32_t ins) {
 		else return UNDEFINED_INSTRUCTION;
 		
 		if(L) { // Load
-		printf("Load\n");
+		printf("------------ Load ------------\n");
 			if (B) {
 				result = arm_read_byte(p, address, &value8);
 				arm_write_register(p, Rd, value8);
@@ -148,12 +161,13 @@ int arm_load_store(arm_core p, uint32_t ins) {
 			}
 		}
 		else { // Store
-		printf("Store\n");
+		printf("------------ Store ------------\n");
 			(B) ? (arm_write_byte(p, address, (uint8_t) contentRd)) : (arm_write_word(p, address, contentRd)) ;
 		}
 		
 	}
 	else if (!M) { //Miscellaneous Load/Store
+	printf("Miscellaneous Load/Store ........................................\n");
 		if(!I && P && B) {
 			if (Rn == 15) {
 				if (!W)
@@ -200,7 +214,10 @@ int arm_load_store(arm_core p, uint32_t ins) {
 			arm_write_register(p, Rd, value16);
 		}
 	}
-	else return UNDEFINED_INSTRUCTION;
+	else {
+		printf("------------ Else ------------\n");
+		return UNDEFINED_INSTRUCTION;
+	}
 	
 	
 	if (I && !B && L) { /* LDR */
