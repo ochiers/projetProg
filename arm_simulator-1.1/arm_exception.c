@@ -43,22 +43,7 @@ void arm_exception(arm_core p, unsigned char exception)
 			arm_write_cpsr(p, 0x1d3 | Exception_bit_9);
 			arm_write_usr_register(p, PC_USER, 0);
 			break;
-
-
-
-
-
-
-/*
-		case SOFTWARE_INTERRUPT:					// Semantics of reset interrupt (ARM manual A2-18)
-			break;
-
-
-
-
-
-
-//%%%%%%%%%%%%%%%%%%%%%%% Tous  le reste doit etre en commentaire jusqu'au test de instruction
+/*%%%%%%%%%%%%%%%%%%%%%%% Tous  le reste doit etre en commentaire jusqu'au test de instruction
 		case UNDEFINED_INSTRUCTION:
 			
 			break;
@@ -71,7 +56,6 @@ void arm_exception(arm_core p, unsigned char exception)
 #define FAST_INTERRUPT          7
 */		default:
 			printf("\n\n**** Traitement d'execption ****\n");
-			printf("\n\n**** Exception non geree: %d ****\n", exception);
-			exit(0);
+			printf("**** Exception non geree: %d ****\n", exception);
 	}
 }

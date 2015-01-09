@@ -6,6 +6,12 @@
 
 
 
+char *description;
+char *oper;
+
+
+
+
 
 
 // ------------------------------------------
@@ -31,13 +37,14 @@
 //	- irn:			numero du registre operande 0
 //	- rd:			numero du registre destination
 //	- S: 			indique si les codes conditions doivent etre mis a jours
+//	- I: 			indique si le secon operande est un immediat
 //	- op:			code de l'operation a realiser
 // ------------------------------------------
-	void readOperand(arm_core p, uint32_t ins, uint32_t *o0, uint32_t *o1, uint8_t *shifter_carry_out, uint8_t *irn, uint8_t *rd, uint8_t *S, uint8_t *op);
+	void readOperand(arm_core p, uint32_t ins, uint32_t *o0, uint32_t *o1, uint8_t *shifter_carry_out, uint8_t *irn, uint8_t *rd, uint8_t *S, uint8_t *I, uint8_t *op);
 // ------------------------------------------
 // Affiche les differantes valeurs de l'instruction
 // ------------------------------------------
-	void printInstrdataProcessingShift(uint8_t op, uint8_t S, uint8_t rn, uint8_t rd, uint32_t o0, uint32_t o1);
+	void printInstrdataProcessingShift(arm_core p, uint8_t op, uint8_t S, uint8_t I, uint8_t rn, uint8_t rd, uint32_t o0, uint32_t o1, uint32_t res);
 // ------------------------------------------
 // Lit la valeur de l'opperande 1 et du shifter_carry dans le
 // cas ou l'opperande 1 est code par un registre et le decalage est
