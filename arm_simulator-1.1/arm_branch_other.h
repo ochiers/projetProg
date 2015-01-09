@@ -27,9 +27,9 @@ Contact: Guillaume.Huard@imag.fr
 
 int arm_branch(arm_core p, uint32_t ins);
 
-//!!! L'utilisation de BLX avec un registre impair fait passer au jeu d'instruction Thumb
+//!!! L'utilisation de BLX avec un registre contenant une adresse impaire fait passer au jeu d'instruction Thumb
 // Cette fonctionnalité n'étant (pas encore ;) implémenter,
-// BLX NE DOIT ETRE APPELÉ QUE SUR DES REGISTRES PAIR
+// BLX NE DOIT ETRE APPELÉ QUE SUR DES REGISTRES CONTENANT DES ADRESSES PAIRES
 int arm_branch_X(arm_core p, uint32_t ins);
 int arm_coprocessor_others_swi(arm_core p, uint32_t ins);
 int arm_miscellaneous(arm_core p, uint32_t ins);
