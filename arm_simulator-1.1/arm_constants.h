@@ -44,7 +44,8 @@ Contact: Guillaume.Huard@imag.fr
 #define INTERRUPT               6
 #define FAST_INTERRUPT          7
 
-#define UNIMPLEMENTED_INSTRUCTION -1
+#define UNIMPLEMENTED_INSTRUCTION -1		// Exceptions ajoutees pour le simulateur
+						// (doivent etre < 0)
 
 
 /* Some CPSR bits */
