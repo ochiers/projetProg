@@ -8,25 +8,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define PC_USER			15
+#define PC_USER	15
 
 #define PROCESSING_SHIFT	1 
 #define PROCESSING_IMM_MSR	2 
-#define	LOAD_STORE		3
+#define	LOAD_STORE			3
 #define MISCELLANEOUS		4
-#define	BRANCH			5
-#define	MULTIPLIE		6
-#define	SWI			7
+#define	BRANCH				5
+#define	MULTIPLIE			6
+#define	SWI					7
 #define	NON_ENCORE_TRAITE	8
-#define	ERREUR			0
+#define	ERREUR				0
 
-#define SIMPLE_LOAD_STORE	0
-#define MULTIPLE_LOAD_STORE	1
+#define SIMPLE_LOAD_STORE		0
+#define MULTIPLE_LOAD_STORE		1
 #define COPROCESSOR_LOAD_STORE	2
-#define EXTRA_LOAD_STORE	3
+#define EXTRA_LOAD_STORE		3
 
 //---------------------------------------------------
-/* Retourne:
+// Retourne:
 //	 0 si la condition est mauvaise, 
 //	 1 lorsque la condition est bonne, 
 //	 2 si on doit executer arm_miscellaneous (contenu dans arm_branch_other)
@@ -45,8 +45,7 @@ int evaluer_condition(arm_core p, uint32_t instruction) {
 	V_courant=get_bit(CPSR_courant,CPSR_V);
 
 	condition_courante = instruction >> 28; 
-	switch(condition_courante)
-	{
+	switch (condition_courante) {
 		case COND_EQ:	flag_condition = (Z_courant==1);							break;
 		case COND_NE:	flag_condition = (Z_courant==0);							break;
 		case COND_CS:	flag_condition = (C_courant==1);							break;
@@ -136,15 +135,15 @@ int evaluer_categorie(arm_core p, uint32_t instruction) {
 			if (bit24)						
 				categorie = SWI;				//ligne 18
 			else							
-				categorie = NON_ENCORE_TRAITE;	//ligne 16, 17
+				categorie = NON_ENCORE_TRAITE;	//ligne 16 & 17
 			break; 
 		default:
-			categorie = NON_ENCORE_TRAITE;		//ligne 16, 17, 18
+			categorie = NON_ENCORE_TRAITE;		//ligne 16 & 17 & 18
 	}
 	return categorie;
 }
 //---------------------------------------------------
-// Retourne	: 
+// Retourne: 
 //		SIMPLE_LOAD_STORE		0
 //		MULTIPLE_LOAD_STORE		1
 //		COPROCESSOR_LOAD_STORE	2
