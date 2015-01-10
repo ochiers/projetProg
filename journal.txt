@@ -1,0 +1,113 @@
+---------------------------- JOURNAL ----------------------------
+
+    ******** Lundi 5 Janvier ********
+    
+    Mise en place du Github
+    
+    Analyse du sujet
+    
+    Codage de l'accès et écriture mémoire
+    
+    Répartition du travail en fonction des fichiers à traiter.
+    4 fichiers, 4 types de décodage et de traitement de l'instruction.
+    
+    arm_instruction.c : Décodage de la condition et du type de l'instruction.
+    arm_data_processing.c : Décodage de l'instruction et du mode d'adressage.
+    arm_load_store.c : __________________________________________________
+    arm_branch_other.c : _____________________________________________________
+    
+    
+    ******** Mardi 6 Janvier ********
+    ******** Avancement      ********
+    
+    arm_instruction.c :
+    arm_data_processing.c :
+    arm_load_store.c :  Analyse de la doc. ARM, mise en parrallèle des différents modes d'adressages.
+                        Détermination des conditions de différenciation des modes d'@.
+                        
+    arm_branch_other.c :
+    
+    ******** Mercredi 7 Janvier ********
+    ******** Avancement      ********
+    
+    arm_instruction.c :
+    arm_data_processing.c :
+    arm_load_store.c :  Mise en place des algorithmes du traitement des pre(post)-increments d'adresses immediate, ou par registres.
+                        
+    arm_branch_other.c :
+    
+    ******** Jeudi 8 Janvier ********
+    ******** Avancement      ********
+    
+    arm_instruction.c :
+    arm_data_processing.c :
+    arm_load_store.c :  Mise en place des algorithmes des "Miscellaneous Load/Store".
+                        
+    arm_branch_other.c :
+    
+    ******** Vendredi 9 Janvier ********
+    ******** Avancement      ********
+    
+    arm_instruction.c :
+    arm_data_processing.c :
+    arm_load_store.c :  Test des Load/Store. Modification des codes conditions afin d'appliquer le bon traitement à l'adresse.
+                        
+    arm_branch_other.c :
+    
+    ******** Samedi 10 Janvier ********
+    ******** Avancement      ********
+    
+    arm_instruction.c :
+    arm_data_processing.c :
+    arm_load_store.c :                          
+    arm_branch_other.c :
+    
+    ******** Lundi 12 Janvier ********
+    ******** Avancement      ********
+    
+    arm_instruction.c :
+    arm_data_processing.c :
+    arm_load_store.c :  Analyse de la doc. ARM, mise en parrallèle des différents modes d'adressages.
+                        Détermination des conditions de différenciation des modes d'@.
+                        
+    arm_branch_other.c :
+    
+    ******** Mardi 13 Janvier ********
+    ******** Avancement      ********
+    
+    arm_instruction.c :
+    arm_data_processing.c :
+    arm_load_store.c :  Analyse de la doc. ARM, mise en parrallèle des différents modes d'adressages.
+                        Détermination des conditions de différenciation des modes d'@.
+                        
+    arm_branch_other.c :
+    
+    ******** Mercredi 14 Janvier ********
+    ******** Avancement      ********
+    
+    arm_instruction.c :
+    arm_data_processing.c :
+    arm_load_store.c :  Analyse de la doc. ARM, mise en parrallèle des différents modes d'adressages.
+                        Détermination des conditions de différenciation des modes d'@.
+                        
+    arm_branch_other.c :
+    
+    ******** Jeudi 15 Janvier ********
+    ******** Avancement      ********
+    
+    arm_instruction.c :
+    arm_data_processing.c :
+    arm_load_store.c :  Analyse de la doc. ARM, mise en parrallèle des différents modes d'adressages.
+                        Détermination des conditions de différenciation des modes d'@.
+                        
+    arm_branch_other.c :
+    
+    ******** Vendredi 16 Janvier ********
+    ******** Avancement      ********
+    
+    arm_instruction.c :
+    arm_data_processing.c :
+    arm_load_store.c :  Analyse de la doc. ARM, mise en parrallèle des différents modes d'adressages.
+                        Détermination des conditions de différenciation des modes d'@.
+                        
+    arm_branch_other.c :
