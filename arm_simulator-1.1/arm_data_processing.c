@@ -28,8 +28,8 @@ int arm_data_processing_shift(arm_core p, uint32_t ins)
 	uint32_t res=0, o0, o1;
 	uint32_t cpsr = arm_read_cpsr(p);
 	uint8_t rd, rn, S, op, shifter_carry_out, I;
-	uint8_t cflag = (get_bit(cpsr, CPSR_C) >> CPSR_C);
-	uint8_t ncflag = ((~cflag) & 0x1);
+	uint8_t cflag	= (get_bit(cpsr, CPSR_C) >> CPSR_C);
+	uint8_t ncflag	= ((~cflag) & 0x1);
 	description	= malloc(sizeof(char) * 1024);
 	oper		= malloc(sizeof(char) * 1024);
 
@@ -115,9 +115,6 @@ int arm_data_processing_shift(arm_core p, uint32_t ins)
 				}
 				sprintf(oper, "TST");
 				res = o0 & o1;
-
-
-
 				if (get_bit(res, 31))		cpsr = set_bit(cpsr, CPSR_N);
 				else				cpsr = clr_bit(cpsr, CPSR_N);
 				if (res == 0)			cpsr = set_bit(cpsr, CPSR_Z);
@@ -259,12 +256,12 @@ void printInstrdataProcessingShiftOp(arm_core p, uint8_t op, uint8_t S, uint8_t 
 	printf("\t\t* opcode\t: ");		printBin(op, 4, 0); printf(" %s\n", oper);
 	printf("\t\t* S\t\t: ");		printBin(S,  1, 1);
 	printf("\t\t* I\t\t: ");		printBin(I,  1, 1);
-	printf("\t\t* Rd\t\t: %d\n", rd);
-	printf("\t\t* Rn\t\t: %d\n", rn);
-	printf("\t\t* Valeur o0:\t: %d\n", o0);
-	printf("\t\t* Valeur o1:\t: %d%s\n", o1, description);
-	printf("\t\t* Valeur res\t: %d\n", res);
-	printf("\t\t* Valeur Rd\t: "); printBin(arm_read_register(p, rd), 32, 1);
+	printf("\t\t* Rd\t\t: %d\n",		rd);
+	printf("\t\t* Rn\t\t: %d\n",		rn);
+	printf("\t\t* Valeur o0:\t: %d\n",	o0);
+	printf("\t\t* Valeur o1:\t: %d%s\n",	o1, description);
+	printf("\t\t* Valeur res\t: %d\n",	res);
+	printf("\t\t* Valeur Rd\t: ");		printBin(arm_read_register(p, rd), 32, 1);
 	printf("\t----------------------------------------\n");
 }
 // ------------------------------------------
@@ -282,9 +279,9 @@ void printInstrdataProcessingShiftTest(uint8_t op, uint8_t S, uint8_t I, uint8_t
 		printf("\t\t* opcode\t: ");		printBin(op, 4, 0); printf(" %s\n", oper);
 		printf("\t\t* S\t\t: ");		printBin(S,  1, 1);
 		printf("\t\t* I\t\t: ");		printBin(I,  1, 1);
-		printf("\t\t* Rn\t\t: %d\n", rn);
-		printf("\t\t* Valeur o0:\t: %d\n", o0);
-		printf("\t\t* Valeur o1:\t: %d%s\n", o1, description);
+		printf("\t\t* Rn\t\t: %d\n",		rn);
+		printf("\t\t* Valeur o0:\t: %d\n",	o0);
+		printf("\t\t* Valeur o1:\t: %d%s\n",	o1, description);
 	}
 	printf("\t----------------------------------------\n");
 }
@@ -293,8 +290,8 @@ void printInstrdataProcessingShiftTest(uint8_t op, uint8_t S, uint8_t I, uint8_t
 // cas ou l'opperande 1 est code par un registre et le decalage est
 // code par un immediat
 // Parametre d'entree:
-//	- p:		etat du processeur
-//	- ins:		instruction
+//	- p:	etat du processeur
+//	- ins:	instruction
 // Parametre d'entree sortie:
 //	- o1:	Valeur de l'operande 1 (doit avoir ete
 //		initialise avec la valeur de Rm (doc p 448))
@@ -364,7 +361,7 @@ void readOperand1_immShift(arm_core p, uint32_t ins, uint32_t *o1, uint8_t *shif
 //	- p:		etat du processeur
 //	- ins:		instruction
 // Parametre d'entree sortie:
-//	- o1:	Valeur de l'operande 1
+//	- o1:		Valeur de l'operande 1
 // Parametre de sortie:
 //	- shifter_carry_out: voir doc p 446
 // ------------------------------------------
