@@ -286,7 +286,7 @@ static int arm_execute_instruction(arm_core p) {
 	if (resultat == SUCCESS) {
 		cpsr = arm_read_cpsr(p);
 		printf("\t- Resultat:\n");
-		printf("\t\t* Mode\t\t: ");	printBin((cpsr & 0xF), 4, 0); printf("\t%s\n", arm_get_mode_name(cpsr & 0xF));//Corriger la valeur de mode
+		printf("\t\t* Mode\t\t: ");	printBin((cpsr & 0x1F), 5, 0); printf("\t%s\n", arm_get_mode_name(cpsr & 0x1F));//Corriger la valeur de mode
 		printf("\t\t* NZCV\t\t: ");	printBin((cpsr >> 28), 4, 1);
 	}
 	return resultat;

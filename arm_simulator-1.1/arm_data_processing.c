@@ -256,12 +256,12 @@ void printInstrdataProcessingShiftOp(arm_core p, uint8_t op, uint8_t S, uint8_t 
 	printf("\t\t* opcode\t: ");			printBin(op, 4, 0); printf(" %s\n", oper);
 	printf("\t\t* S\t\t: ");			printBin(S,  1, 1);
 	printf("\t\t* I\t\t: ");			printBin(I,  1, 1);
-	printf("\t\t* Rd\t\t: %d\n",			rd);
-	printf("\t\t* Rn\t\t: %d\n",			rn);
-	printf("\t\t* Valeur o0:\t: %d\n",		o0);
-	printf("\t\t* Valeur o1:\t: %d (%s)\n",	o1, description);
-	printf("\t\t* Valeur res\t: %d\n",		res);
-	printf("\t\t* Valeur Rd\t: ");		printBin(arm_read_register(p, rd), 32, 1);
+	printf("\t\t* Rd\t\t: %u\n",			rd);
+	printf("\t\t* Rn\t\t: %u\n",			rn);
+	printf("\t\t* Valeur o0:\t: %u\n",		o0);
+	printf("\t\t* Valeur o1:\t: %u (%s)\n",		o1, description);
+	printf("\t\t* Valeur res\t: %u\n",		res);
+	printf("\t\t* Valeur Rd\t: ");			printBin(arm_read_register(p, rd), 32, 1);
 	printf("\t----------------------------------------\n");
 }
 // ------------------------------------------
@@ -280,8 +280,8 @@ void printInstrdataProcessingShiftTest(uint8_t op, uint8_t S, uint8_t I, uint8_t
 		printf("\t\t* S\t\t: ");		printBin(S,  1, 1);
 		printf("\t\t* I\t\t: ");		printBin(I,  1, 1);
 		printf("\t\t* Rn\t\t: %d\n",		rn);
-		printf("\t\t* Valeur o0:\t: %d\n",	o0);
-		printf("\t\t* Valeur o1:\t: %d (%s)\n",	o1, description);
+		printf("\t\t* Valeur o0:\t: %u\n",	o0);
+		printf("\t\t* Valeur o1:\t: %u (%s)\n",	o1, description);
 	}
 	printf("\t----------------------------------------\n");
 }
