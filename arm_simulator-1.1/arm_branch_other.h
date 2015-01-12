@@ -46,5 +46,7 @@ uint32_t lecture_entier_immediat_signe_24bits(uint32_t instruction);
 void print_information_instruction_B_BL(arm_core p,	uint32_t instruction);
 void print_information_instruction_BLX(arm_core p,	uint32_t instruction);
 
+int partie_commune_msr(arm_core p, uint32_t ins, uint32_t operande);
+
 
 #endif
