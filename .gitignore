@@ -2,7 +2,6 @@
 *.o
 *.Po
 arm_simulator-1.1/config.log
-arm_simulator-1.1/Examples/Makefile
 arm_simulator-1.1/Examples/config.h
 arm_simulator-1.1/Examples/config.status
 arm_simulator-1.1/Examples/example1
@@ -11,11 +10,10 @@ arm_simulator-1.1/Examples/example3
 arm_simulator-1.1/Examples/example4
 arm_simulator-1.1/Examples/insertion_sort
 arm_simulator-1.1/Examples/stamp-h1
-arm_simulator-1.1/Makefile
 arm_simulator-1.1/arm_simulator
 arm_simulator-1.1/config.h
 arm_simulator-1.1/config.status
 arm_simulator-1.1/memory_test
 arm_simulator-1.1/send_irq
 arm_simulator-1.1/stamp-h1
-Examples/autom4te.cache/*
+Examples/autom4te.cache/
