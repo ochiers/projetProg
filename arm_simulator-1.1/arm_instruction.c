@@ -230,7 +230,7 @@ static int arm_execute_instruction(arm_core p) {
 				break;
 			case PROCESSING_IMM_MSR:
 				printf("arm_miscellanous\n");	
-				resultat = arm_miscellanous(p, instruction);	
+				resultat = arm_miscellaneous(p, instruction);	
 				break;
 			case LOAD_STORE:
 				type = sous_categorie_load_store(instruction);
