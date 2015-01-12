@@ -30,6 +30,7 @@ int arm_data_processing_shift(arm_core p, uint32_t ins)
 	uint8_t rd, rn, S, op, shifter_carry_out, I;
 	uint8_t cflag	= (get_bit(cpsr, CPSR_C) >> CPSR_C);
 	uint8_t ncflag	= ((~cflag) & 0x1);
+	int ret = SUCCESS;
 	description	= malloc(sizeof(char) * 1024);
 	oper		= malloc(sizeof(char) * 1024);
 
@@ -186,8 +187,7 @@ int arm_data_processing_shift(arm_core p, uint32_t ins)
 		if (rd == 15)									//	Cas d'un changement de pc
 		{
 			if (arm_current_mode_has_spsr(p)) arm_write_cpsr(p, arm_read_spsr(p));	//		CPSR <- SPSR
-												//		else return UNPREDICTABLE;
-												//		Droit d'acces a CPSR refuse
+			else ret = UNPREDICTABLE;
 		}
 		else										//	Cas general (Les flags C, v sont mis a
 		{										//	jours par l'execution des instructions)
@@ -197,11 +197,10 @@ int arm_data_processing_shift(arm_core p, uint32_t ins)
 			else			cpsr = clr_bit(cpsr, CPSR_N);
 			arm_write_cpsr(p, cpsr);
 		}
-
 	}
 	free(description);
 	free(oper);
-	return SUCCESS;
+	return ret;
 }
 // ------------------------------------------
 // Lit les valeur des registres dans l'instruction
