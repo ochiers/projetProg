@@ -286,7 +286,7 @@ static int arm_execute_instruction(arm_core p) {
 	if (resultat == SUCCESS) {
 		cpsr = arm_read_cpsr(p);
 		printf("\t- Resultat:\n");
-		printf("\t\t* Mode\t\t: ");	printBin((cpsr & 0x1F), 5, 0); printf("\t%s\n", arm_get_mode_name(cpsr & 0x1F));//Corriger la valeur de mode
+		printf("\t\t* Mode\t\t: ");	printBin((cpsr & 0xF), 5, 0); printf("\t%s\n", arm_get_mode_name(cpsr & 0xF));//Corriger la valeur de mode
 		printf("\t\t* NZCV\t\t: ");	printBin((cpsr >> 28), 4, 1);
 	}
 	return resultat;
@@ -302,8 +302,12 @@ int arm_step(arm_core p) {
 	} else if (result < 0) { 	// Exceptions personelles
 		switch (result)	{
 			case UNIMPLEMENTED_INSTRUCTION:	
-				printf("\t- Instruction \n");	
+				printf("\t- Instruction non implantee\n");	
 				break;
+			case UNPREDICTABLE:
+				printf("\t- Comportement indéfini \n");	
+				break;				
+			
 			default: 
 				printf("*** Code exception non pris en charge ***\n");
 		}

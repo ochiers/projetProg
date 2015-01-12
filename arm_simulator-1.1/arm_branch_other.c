@@ -85,10 +85,70 @@ int arm_coprocessor_others_swi(arm_core p, uint32_t ins) {
 }
 
 
-
-
 int arm_msr_immediate_operand(arm_core p, uint32_t ins){
-	return UNIMPLEMENTED_INSTRUCTION;
+
+	uint32_t R = get_bit( ins, 22); 	
+	uint32_t field_mask_c = get_bit(ins, 19);
+	uint32_t field_mask_x = get_bit(ins, 18);
+	uint32_t field_mask_s = get_bit(ins, 17);
+	uint32_t field_mask_f = get_bit(ins, 16);
+	uint32_t operande = get_bits(ins, 8, 0);
+	uint32_t rotate_imm = get_bits(ins, 12, 8);
+	uint32_t byte_mask = 0x00000000;
+	uint32_t mask ;
+
+	operande = (ins & 0x0FF);
+	rotate_imm	= (ins & 0xF00) >> 8;
+	operande = ror( operande, rotate_imm * 2);
+
+	// En fait on s'en fout
+	// if ((operande & UnallocMask)!=0){
+		// return UNPREDICTABLE;
+	// }
+
+	
+	if (field_mask_c == 1){
+		byte_mask |= 0x000000FF;
+	} else {
+		byte_mask |= 0x00000000;
+	}
+	if (field_mask_x == 1){
+		byte_mask |= 0x0000FF00;
+	} else {
+		byte_mask |= 0x00000000;
+	}
+	if (field_mask_s == 1){
+		byte_mask |= 0x00FF0000;
+	} else {
+		byte_mask |= 0x00000000;
+	}
+	if (field_mask_f == 1){
+		byte_mask |= 0xFF000000;
+	} else {
+		byte_mask |= 0x00000000;
+	}
+	
+	if (!R) {
+		if (arm_in_a_privileged_mode(p)) {
+			if ((operande & StateMask) !=0) {
+				return UNPREDICTABLE;
+			} else {
+				mask = byte_mask & (UserMask | PrivMask);
+			}
+		} else {
+			mask = byte_mask & UserMask;
+		}
+		arm_write_cpsr( p, ( (arm_read_cpsr(p) & ~mask) | (operande & mask) ) );
+	} else {
+		if (arm_current_mode_has_spsr(p)) {
+			mask = byte_mask & (UserMask | PrivMask | StateMask);
+			arm_write_spsr( p, ( (arm_read_spsr(p) & ~mask) | (operande & mask) ) );
+		} else {
+			return UNPREDICTABLE;
+		}
+	}
+	
+	return SUCCESS;
 }
 int arm_msr_register_operand(arm_core p, uint32_t ins){
 	return UNIMPLEMENTED_INSTRUCTION;
