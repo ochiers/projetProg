@@ -302,10 +302,14 @@ int arm_step(arm_core p) {
 	} else if (result < 0) { 	// Exceptions personelles
 		switch (result)	{
 			case UNIMPLEMENTED_INSTRUCTION:	
-				printf("\t- Instruction \n");	
+				printf("\t- Instruction non implantee\n");	
 				break;
+			case UNPREDICTABLE:
+				printf("\t- Comportement indéfini \n");	
+				break;				
+			
 			default: 
-				printf("*** Code exception non pris en charge ***\n");
+				printf("*** Code exception non pris en charge: %d ***\n", result);
 		}
 		result = SUCCESS;
 	}
