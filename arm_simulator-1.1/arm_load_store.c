@@ -71,8 +71,8 @@ int arm_load_store(arm_core p, uint32_t ins) {
 	uint32_t addressRn = arm_read_register(p, Rn);	/* Adresse de base, contenue dans Rn */
 	uint32_t contentRm = arm_read_register(p, Rm);	/* Offset contenu dans le registre Rm */
 	
-	uint8_t value8;
-	uint32_t value32;
+	uint8_t value8 = 0;
+	uint32_t value32 = 0;
 	
 	/* Variables pour Load/Store simple */
 	
@@ -93,8 +93,8 @@ int arm_load_store(arm_core p, uint32_t ins) {
 	uint8_t immedL = get_bits(ins, 4, 0);
 	uint8_t offset8 = 0;
 	
-	uint16_t value16;
-	printf("........................................... ARM_LOAD_STORE ...........................................\n");
+	uint16_t value16 = 0;
+	
 	printf("	- M : %d\n", M);
 	printf("	- I : %d\n", I);
 	printf("	- P : %d\n", P);
@@ -108,30 +108,26 @@ int arm_load_store(arm_core p, uint32_t ins) {
 	printf("	- addressRn : %d\n", addressRn);
 	printf("	- contentRm : %d\n", contentRm);
 	printf("	- contentRd : %d\n", contentRm);
+	printf("\n	- Instruction : ");
 	
-	if(M && Rm !=15 && Rn != Rm) { /* Load/Store simple */
-	printf("	........................................ Load/Store Simple ........................................\n");
+	if(M && Rn != Rm) { /* Load/Store simple */
 		if (!I && P) { /* Immediate Offset, ARM-Doc p.460 */
-//	printf("Immediate Offset ------------------------------------------------------------------------------------- \n");
 			(U) ? (address = addressRn + offset12) : (address = contentRm - offset12);
 			if (W) /* Immediate Pre-indexed, ARM-Doc p.464 */
 				arm_write_register(p, Rn, address);
 		}
 		else if (I && P && !shifter) { /* Register Offset, ARM-Doc p.461 */
-//	printf("Register Offset ------------------------------------------------------------------------------------- \n");
 			(U) ? (address = addressRn + contentRm) : (address = addressRn - contentRm);
 			if (W) /* Register Pre-indexed, ARM-Doc p.465 */
 				arm_write_register(p, Rn, address);                                 
 		}
 		else if (I && P) { /* Scaled Register Offset, ARM-Doc p.463 */
-//	printf("Scaled Register ------------------------------------------------------------------------------------- \n");
 			index = scaledRegisterSwitch(p, shift, shift_imm, addressRn, contentRm);
 			(U) ? (address = addressRn + index) : (address = addressRn - index);
 			if (W) /* Scaled Register Pre-indexed, ARM-Doc p.466 */
 				arm_write_register(p, Rn, address);
 		}
 		else if (I && !P && !W && !shifter) { /* Register Post-indexed, ARM-Doc p.470 */
-//	printf("Register Post-indexed ------------------------------------------------------------------------------------- \n");
 			address = addressRn;
 			(U) ? (arm_write_register(p, Rn, addressRn + contentRm)) : (arm_write_register(p, Rn, addressRn - contentRm));
 		}
@@ -146,24 +142,38 @@ int arm_load_store(arm_core p, uint32_t ins) {
 		}
 		else return UNDEFINED_INSTRUCTION;
 		
-		if(L) { /* Load */
-		printf("			------------ Load ------------\n");
-			if (B) {
-				result = arm_read_byte(p, address, &value8);
-				arm_write_register(p, Rd, value8);
-//				printf("		- value8 : %d\n", value8);
+		if (M && !B && L) { /* LDR */
+			printf(" LDR\n");
+			result = arm_read_word(p, address, &value32);
+			if (Rd == 15) {
+				arm_write_register(p, 15, value32 && 0xFFFFFFFC);
 			}
 			else {
-				result = arm_read_word(p, address, &value32);
 				arm_write_register(p, Rd, value32);
-//				printf("		- value32 : %d\n", value32);
 			}
 		}
-		else { /* Store */
-		printf("			------------ Store ------------\n");
-			(B) ? (arm_write_byte(p, address, (uint8_t) contentRd)) : (arm_write_word(p, address, contentRd)) ;
+		else if (M && B && L) { /* LDRB */
+			printf(" LDRB\n");
+			result = arm_read_byte(p, address, &value8);
+			arm_write_register(p, Rd, value8);
 		}
-		
+		else if (!M && !I && L) { /* LDRH */
+			printf(" LDRH\n");
+			result = arm_read_half(p, address, &value16);
+			arm_write_register(p, Rd, value16);
+		}
+		else if (M && !B && !L) { /* STR */
+			printf(" STR\n");
+			result = arm_write_word(p, address, contentRd);
+		}
+		else if (M && B && !L) { /* STRB */
+			printf(" STRB\n");
+			result = arm_write_byte(p, address, (uint8_t) contentRd);
+		}
+		else if (!M && !I && !L) { /* STRH */
+			printf(" STRH\n");
+			result = arm_write_half(p, address, (uint16_t) contentRd);
+		}		
 	}
 	else if (!M) { //Miscellaneous Load/Store
 	printf("	........................................ Miscellaneous Load/Store ........................................\n");
@@ -215,25 +225,6 @@ int arm_load_store(arm_core p, uint32_t ins) {
 	}
 	else return UNDEFINED_INSTRUCTION;
 	
-	if (M && !B && L) { /* LDR */
-		printf("................. LDR\n");
-	}
-	else if (M && B && L) { /* LDRB */
-		printf("................. LDRB\n");
-	}
-	else if (!M && !I && L) { /* LDRH */
-		printf("................. LDRH\n");
-	}
-	else if (M && !B && !L) { /* STR */
-		printf("................. STR\n");
-	}
-	else if (M && B && !L) { /* STRB */
-		printf("................. STRB\n");
-	}
-	else if (!M && !I && !L) { /* STRH */
-		printf("................. STRH\n");
-	}
-	
     return result;
 }
 
@@ -264,6 +255,10 @@ int arm_load_store_multiple(arm_core p, uint32_t ins) {
 		if (listOfRegister[i])
 			numberOfRegister++;
 	}
+	
+	printf("	- L : %d\n", L);
+	printf("	- numberOfRegister : %d\n", numberOfRegister);
+	
 
 	if (L && S) 
 		return SUCCESS;
@@ -290,10 +285,13 @@ int arm_load_store_multiple(arm_core p, uint32_t ins) {
 		
 	if (L) { /* Load */
 		i = 0;
-		while (numberOfRegister && startAddress != endAddress) {
+		while (numberOfRegister && startAddress <= endAddress) {
 			while (!listOfRegister[i] && i < 16) {
 				i++;
 			}
+			listOfRegister[i] = 0;
+			printf("--------------------------------- i : %d\n", i);
+			printf("--------------------------------- R : %d\n", numberOfRegister);
 			result = arm_read_word(p, startAddress, &value32);
 			arm_write_register(p, i, value32);
 			startAddress += 4;
@@ -302,10 +300,11 @@ int arm_load_store_multiple(arm_core p, uint32_t ins) {
 	}
 	else { /* Store */
 		i = 0;
-		while (numberOfRegister && startAddress != endAddress) {
+		while (numberOfRegister && startAddress <= endAddress) {
 			while (!listOfRegister[i] && i < 16) {
 				i++;
 			}
+			listOfRegister[i] = 0;
 			result = arm_write_word(p, startAddress, arm_read_register(p, i));
 			startAddress += 4;
 			numberOfRegister--;

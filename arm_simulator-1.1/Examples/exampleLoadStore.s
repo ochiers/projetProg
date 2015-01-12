@@ -1,10 +1,6 @@
 .global main
 .text
 main:
-    bl init
-
-fin:
-    swi 0x123456
     
 init:
 	mov r0, #0x12
@@ -32,8 +28,25 @@ testldrb:
 testldrh:
 	strh r1, [r4]
 	ldrh r7, [r4]
-	bl fin
 	
+testldrm:
+	mov r2, #0x43
+	add r1, r2, r1, lsl #8
+	mov r2, #0x21
+	add r1, r2, r1, lsl #8
+	mov r2, #0x11
+	mov r3, #0x22
+	add r2, r3, r2, lsl #8
+	mov r3, #0x33
+	add r2, r3, r2, lsl #8
+	mov r3, #0x44
+	add r2, r3, r2, lsl #8
+	mov r4, #0x80
+	stm r4, {r0, r1, r2}
+	ldm r4, {r9, r10, r11}
+
+fin:
+    swi 0x123456
 	
 adr_valeur: .word valeur
 
