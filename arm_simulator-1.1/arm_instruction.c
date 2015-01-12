@@ -229,8 +229,8 @@ static int arm_execute_instruction(arm_core p) {
 				resultat = arm_data_processing_shift(p, instruction);
 				break;
 			case PROCESSING_IMM_MSR:
-				printf("arm_data_processing_immediate_msr\n");	
-				resultat = arm_data_processing_immediate_msr(p, instruction);	
+				printf("arm_miscellanous\n");	
+				resultat = arm_miscellanous(p, instruction);	
 				break;
 			case LOAD_STORE:
 				type = sous_categorie_load_store(instruction);
@@ -286,7 +286,7 @@ static int arm_execute_instruction(arm_core p) {
 	if (resultat == SUCCESS) {
 		cpsr = arm_read_cpsr(p);
 		printf("\t- Resultat:\n");
-		printf("\t\t* Mode\t\t: ");	printBin((cpsr & 0x1F), 5, 0); printf("\t%s\n", arm_get_mode_name(cpsr & 0x1F));//Corriger la valeur de mode
+		printf("\t\t* Mode\t\t: ");	printBin((cpsr & 0x1F), 5, 0); printf("\t%s\n", arm_get_mode_name(cpsr & 0x1F));
 		printf("\t\t* NZCV\t\t: ");	printBin((cpsr >> 28), 4, 1);
 	}
 	return resultat;

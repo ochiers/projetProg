@@ -16,10 +16,6 @@ char *oper;
 
 // ------------------------------------------
 // Decoding functions for different classes of instructions
-// ------------------------------------------
-	int arm_data_processing_immediate_msr(arm_core p, uint32_t ins);
-// ------------------------------------------
-// Decoding functions for different classes of instructions
 // Execute la fonction
 // Met a jours le registre destination
 // Met a jour le registre d'etat cpsr en fonction du bit S et
