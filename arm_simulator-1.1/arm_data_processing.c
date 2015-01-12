@@ -231,12 +231,27 @@ void readOperand(arm_core p, uint32_t ins, uint32_t *o0, uint32_t *o1, uint8_t *
 	*I = (ins & 0x2000000) >> 25;								// Calcule Operande 1
 	if (*I)											//	Cas d'un immediat
 	{
+
+
+
 		immed		= (ins & 0x0FF);
 		rotate_imm	= (ins & 0xF00) >> 8;
 		*o1		= ror (immed, rotate_imm*2);
 		if (rotate_imm == 0)	*shifter_carry_out = get_bit(arm_read_cpsr(p), CPSR_C);
 		else			*shifter_carry_out = get_bit(ins, 31);
-		sprintf(description, " Operande Immediat %u + rotation droite de %u", immed, rotate_imm);
+		sprintf(description, " Operande Immediat %u + rotation droite de %u", immed, rotate_imm*2);
+
+
+
+
+
+
+
+
+
+
+
+
 	}
 	else											//	Cas d'un registre
 	{
