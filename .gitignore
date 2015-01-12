@@ -18,4 +18,4 @@ arm_simulator-1.1/config.status
 arm_simulator-1.1/memory_test
 arm_simulator-1.1/send_irq
 arm_simulator-1.1/stamp-h1
-Examples/autom4te.cache/
+Examples/autom4te.cache/*
