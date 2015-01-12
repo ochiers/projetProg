@@ -87,24 +87,48 @@ int arm_coprocessor_others_swi(arm_core p, uint32_t ins) {
 
 int arm_msr_immediate_operand(arm_core p, uint32_t ins){
 
-	uint32_t R = get_bit( ins, 22); 	
-	uint32_t field_mask_c = get_bit(ins, 19);
-	uint32_t field_mask_x = get_bit(ins, 18);
-	uint32_t field_mask_s = get_bit(ins, 17);
-	uint32_t field_mask_f = get_bit(ins, 16);
 	uint32_t operande = get_bits(ins, 8, 0);
 	uint32_t rotate_imm = get_bits(ins, 12, 8);
-	uint32_t byte_mask = 0x00000000;
-	uint32_t mask ;
 
 	operande = (ins & 0x0FF);
 	rotate_imm	= (ins & 0xF00) >> 8;
 	operande = ror( operande, rotate_imm * 2);
 
-	// En fait on s'en fout
-	// if ((operande & UnallocMask)!=0){
-		// return UNPREDICTABLE;
-	// }
+	return partie_commune_msr( p, ins, operande);
+	
+}
+int arm_msr_register_operand(arm_core p, uint32_t ins){
+
+	uint32_t reg_operande = get_bits(ins, 4, 0);
+	uint32_t operande;
+	
+	operande=arm_read_register( p, reg_operande);
+
+	return partie_commune_msr( p, ins, operande);
+
+}
+
+int arm_mrs(arm_core p, uint32_t ins){
+	return UNIMPLEMENTED_INSTRUCTION;
+}
+
+
+
+int partie_commune_msr(arm_core p, uint32_t ins, uint32_t operande) {
+
+	uint32_t R = get_bit( ins, 22); 	
+	uint32_t field_mask_c = get_bit(ins, 19);
+	uint32_t field_mask_x = get_bit(ins, 18);
+	uint32_t field_mask_s = get_bit(ins, 17);
+	uint32_t field_mask_f = get_bit(ins, 16);
+	uint32_t byte_mask = 0x00000000;
+	uint32_t mask ;
+
+	
+	
+	if ((operande & UnallocMask)!=0){
+		return UNPREDICTABLE;
+	}
 
 	
 	if (field_mask_c == 1){
@@ -150,13 +174,6 @@ int arm_msr_immediate_operand(arm_core p, uint32_t ins){
 	
 	return SUCCESS;
 }
-int arm_msr_register_operand(arm_core p, uint32_t ins){
-	return UNIMPLEMENTED_INSTRUCTION;
-}
-int arm_mrs(arm_core p, uint32_t ins){
-	return UNIMPLEMENTED_INSTRUCTION;
-}
-
 
 
 
