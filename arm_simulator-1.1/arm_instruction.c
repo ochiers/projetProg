@@ -229,8 +229,8 @@ static int arm_execute_instruction(arm_core p) {
 				resultat = arm_data_processing_shift(p, instruction);
 				break;
 			case PROCESSING_IMM_MSR:
-				printf("arm_data_processing_immediate_msr\n");	
-				resultat = arm_data_processing_immediate_msr(p, instruction);	
+				printf("arm_miscellanous\n");	
+				resultat = arm_miscellanous(p, instruction);	
 				break;
 			case LOAD_STORE:
 				type = sous_categorie_load_store(instruction);
