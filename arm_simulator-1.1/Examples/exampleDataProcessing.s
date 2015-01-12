@@ -10,8 +10,8 @@ main:
 	mov r6, #6
 	mov r7, #7
 	mov r8, #8
-	
-	add	r0, #5
+
+	add r0, #5
 	add r0, r1
 	add r0, r0, #8
 	add r0, r0, r1

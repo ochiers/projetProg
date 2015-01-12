@@ -44,11 +44,7 @@ void arm_exception(arm_core p, unsigned char exception)
 			arm_write_usr_register(p, PC_USER, 0);
 			break;
 /*%%%%%%%%%%%%%%%%%%%%%%% Tous  le reste doit etre en commentaire jusqu'au test de instruction
-		case UNDEFINED_INSTRUCTION:
-			
-			break;
-
-
+#define UNDEFINED_INSTRUCTION	2
 #define SOFTWARE_INTERRUPT      3
 #define PREFETCH_ABORT          4
 #define DATA_ABORT              5

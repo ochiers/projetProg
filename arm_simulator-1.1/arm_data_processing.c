@@ -233,7 +233,7 @@ void readOperand(arm_core p, uint32_t ins, uint32_t *o0, uint32_t *o1, uint8_t *
 	{
 		immed		= (ins & 0x0FF);
 		rotate_imm	= (ins & 0xF00) >> 8;
-		*o1		= ror (immed, rotate_imm);
+		*o1		= ror (immed, rotate_imm*2);
 		if (rotate_imm == 0)	*shifter_carry_out = get_bit(arm_read_cpsr(p), CPSR_C);
 		else			*shifter_carry_out = get_bit(ins, 31);
 		sprintf(description, " Operande Immediat %u + rotation droite de %u", immed, rotate_imm);
@@ -279,7 +279,7 @@ void printInstrdataProcessingShiftTest(uint8_t op, uint8_t S, uint8_t I, uint8_t
 		printf("\t\t* opcode\t: ");		printBin(op, 4, 0); printf(" %s\n", oper);
 		printf("\t\t* S\t\t: ");		printBin(S,  1, 1);
 		printf("\t\t* I\t\t: ");		printBin(I,  1, 1);
-		printf("\t\t* Rn\t\t: %d\n",		rn);
+		printf("\t\t* Rn\t\t: %u\n",		rn);
 		printf("\t\t* Valeur o0:\t: %u\n",	o0);
 		printf("\t\t* Valeur o1:\t: %u (%s)\n",	o1, description);
 	}
