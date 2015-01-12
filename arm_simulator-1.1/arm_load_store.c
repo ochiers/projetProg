@@ -110,8 +110,8 @@ int arm_load_store(arm_core p, uint32_t ins) {
 	printf("	- contentRd : %d\n", contentRm);
 	printf("\n	- Instruction : ");
 	
-	if(M && Rn != Rm) { /* Load/Store simple */
-		if (!I && P) { /* Immediate Offset, ARM-Doc p.460 */
+	if(M) { /* Load/Store simple */
+		if (I == 0 && P == 1) { /* Immediate Offset, ARM-Doc p.460 */
 			(U) ? (address = addressRn + offset12) : (address = contentRm - offset12);
 			if (W) /* Immediate Pre-indexed, ARM-Doc p.464 */
 				arm_write_register(p, Rn, address);
@@ -119,7 +119,7 @@ int arm_load_store(arm_core p, uint32_t ins) {
 		else if (I && P && !shifter) { /* Register Offset, ARM-Doc p.461 */
 			(U) ? (address = addressRn + contentRm) : (address = addressRn - contentRm);
 			if (W) /* Register Pre-indexed, ARM-Doc p.465 */
-				arm_write_register(p, Rn, address);                                 
+				arm_write_register(p, Rn, address);             
 		}
 		else if (I && P) { /* Scaled Register Offset, ARM-Doc p.463 */
 			index = scaledRegisterSwitch(p, shift, shift_imm, addressRn, contentRm);
