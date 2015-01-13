@@ -176,7 +176,6 @@ int arm_load_store(arm_core p, uint32_t ins) {
 		}		
 	}
 	else if (!M) { //Miscellaneous Load/Store
-	printf("	........................................ Miscellaneous Load/Store ........................................\n");
 		if(!I && P && B) {
 			if (Rn == 15) {
 				if (!W)
@@ -201,26 +200,35 @@ int arm_load_store(arm_core p, uint32_t ins) {
 		}
 		
 		if (!L && !S && H) { /* Store Halfword */
+			printf(" STRH\n");
 			result = arm_write_half(p, address, (uint16_t) contentRd);
 		}
 		else if (!L && S && !H) { /* Load Doubleword */
+			printf(" LDRD\n");
 			result = arm_read_word(p, address, &value32);
 			arm_write_register(p, Rd, value32);
+			result = arm_read_word(p, address+4, &value32);
+			arm_write_register(p, Rd + 1, value32);
 		}
 		else if (!L && S && H) { /* Store Doubleword */
+			printf(" STRD\n");
 			result = arm_write_word(p, address, contentRd);
+			result = arm_write_word(p, address + 4, arm_read_register(p, Rd + 1));
 		}
 		else if (L && !S && H) { /* Load Unsigned Halfword */
+			printf(" LDRH\n");
 			result = arm_read_half(p, address, &value16);
 			arm_write_register(p, Rd, value16);
 		}
 		else if (L && S && H) { /* Load signed Byte */
+			printf(" LDRSB\n");
 			result = arm_read_byte(p, address, &value8);
-			arm_write_register(p, Rd, value8);
+			arm_write_register(p, Rd, (0xFFFFFF00 | value8));
 		}
 		else if (L && S && H) { /* Load signed Halfword */
+			printf(" LDRSH\n");
 			result = arm_read_half(p, address, &value16);
-			arm_write_register(p, Rd, value16);
+			arm_write_register(p, Rd, (0xFFFF0000 | value16));
 		}
 	}
 	else return UNDEFINED_INSTRUCTION;
