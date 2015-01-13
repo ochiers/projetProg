@@ -79,6 +79,9 @@ POST_UNINSTALL = :
 noinst_PROGRAMS = example1$(EXEEXT) \
 	example2$(EXEEXT) example3$(EXEEXT) \
 	example4$(EXEEXT) \
+	exampleLoadStore$(EXEEXT) \
+	exampleDataProcessing$(EXEEXT) \
+	exampleDataProcessingSave$(EXEEXT) \
 	insertion_sort$(EXEEXT)
 subdir = .
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
@@ -86,7 +89,7 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/config.h.in $(top_srcdir)/../build-aux/depcomp \
 	../build-aux/compile ../build-aux/depcomp \
 	../build-aux/install-sh ../build-aux/missing \
-	$(top_srcdir)/../build-aux/compile \
+	../build-aux/ylwrap $(top_srcdir)/../build-aux/compile \
 	$(top_srcdir)/../build-aux/install-sh \
 	$(top_srcdir)/../build-aux/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -112,6 +115,17 @@ example3_LDADD = $(LDADD)
 am_example4_OBJECTS = example4.$(OBJEXT)
 example4_OBJECTS = $(am_example4_OBJECTS)
 example4_LDADD = $(LDADD)
+am_exampleDataProcessing_OBJECTS = exampleDataProcessing.$(OBJEXT)
+exampleDataProcessing_OBJECTS = $(am_exampleDataProcessing_OBJECTS)
+exampleDataProcessing_LDADD = $(LDADD)
+am_exampleDataProcessingSave_OBJECTS =  \
+	exampleDataProcessingSave.$(OBJEXT)
+exampleDataProcessingSave_OBJECTS =  \
+	$(am_exampleDataProcessingSave_OBJECTS)
+exampleDataProcessingSave_LDADD = $(LDADD)
+am_exampleLoadStore_OBJECTS = exampleLoadStore.$(OBJEXT)
+exampleLoadStore_OBJECTS = $(am_exampleLoadStore_OBJECTS)
+exampleLoadStore_LDADD = $(LDADD)
 am_insertion_sort_OBJECTS = insertion_sort.$(OBJEXT)
 insertion_sort_OBJECTS = $(am_insertion_sort_OBJECTS)
 insertion_sort_LDADD = $(LDADD)
@@ -149,10 +163,14 @@ am__v_CCAS_ = $(am__v_CCAS_$(AM_DEFAULT_VERBOSITY))
 am__v_CCAS_0 = @echo "  CCAS    " $@;
 am__v_CCAS_1 = 
 SOURCES = $(example1_SOURCES) $(example2_SOURCES) $(example3_SOURCES) \
-	$(example4_SOURCES) $(insertion_sort_SOURCES)
+	$(example4_SOURCES) $(exampleDataProcessing_SOURCES) \
+	$(exampleDataProcessingSave_SOURCES) \
+	$(exampleLoadStore_SOURCES) $(insertion_sort_SOURCES)
 DIST_SOURCES = $(example1_SOURCES) $(example2_SOURCES) \
 	$(example3_SOURCES) $(example4_SOURCES) \
-	$(insertion_sort_SOURCES)
+	$(exampleDataProcessing_SOURCES) \
+	$(exampleDataProcessingSave_SOURCES) \
+	$(exampleLoadStore_SOURCES) $(insertion_sort_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -197,12 +215,12 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /home/s/sidlakhr/Desktop/Boulot/s1/prog5/projet/rendu/projetProg/arm_simulator-1.1/build-aux/missing aclocal-1.14
+ACLOCAL = ${SHELL} /home/o/ochiers/PROG/projet/projetProg/arm_simulator-1.1/build-aux/missing aclocal-1.14
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
-AUTOCONF = ${SHELL} /home/s/sidlakhr/Desktop/Boulot/s1/prog5/projet/rendu/projetProg/arm_simulator-1.1/build-aux/missing autoconf
-AUTOHEADER = ${SHELL} /home/s/sidlakhr/Desktop/Boulot/s1/prog5/projet/rendu/projetProg/arm_simulator-1.1/build-aux/missing autoheader
-AUTOMAKE = ${SHELL} /home/s/sidlakhr/Desktop/Boulot/s1/prog5/projet/rendu/projetProg/arm_simulator-1.1/build-aux/missing automake-1.14
+AUTOCONF = ${SHELL} /home/o/ochiers/PROG/projet/projetProg/arm_simulator-1.1/build-aux/missing autoconf
+AUTOHEADER = ${SHELL} /home/o/ochiers/PROG/projet/projetProg/arm_simulator-1.1/build-aux/missing autoheader
+AUTOMAKE = ${SHELL} /home/o/ochiers/PROG/projet/projetProg/arm_simulator-1.1/build-aux/missing automake-1.14
 AWK = gawk
 CC = arm-elf-gcc
 CCAS = arm-elf-gcc
@@ -227,7 +245,7 @@ LDFLAGS =
 LIBOBJS = 
 LIBS = 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/s/sidlakhr/Desktop/Boulot/s1/prog5/projet/rendu/projetProg/arm_simulator-1.1/build-aux/missing makeinfo
+MAKEINFO = ${SHELL} /home/o/ochiers/PROG/projet/projetProg/arm_simulator-1.1/build-aux/missing makeinfo
 MKDIR_P = /bin/mkdir -p
 OBJEXT = o
 PACKAGE = arm-examples
@@ -242,10 +260,10 @@ SET_MAKE =
 SHELL = /bin/bash
 STRIP = strip
 VERSION = 1.0
-abs_builddir = /home/s/sidlakhr/Desktop/Boulot/s1/prog5/projet/rendu/projetProg/arm_simulator-1.1/Examples
-abs_srcdir = /home/s/sidlakhr/Desktop/Boulot/s1/prog5/projet/rendu/projetProg/arm_simulator-1.1/Examples
-abs_top_builddir = /home/s/sidlakhr/Desktop/Boulot/s1/prog5/projet/rendu/projetProg/arm_simulator-1.1/Examples
-abs_top_srcdir = /home/s/sidlakhr/Desktop/Boulot/s1/prog5/projet/rendu/projetProg/arm_simulator-1.1/Examples
+abs_builddir = /home/o/ochiers/PROG/projet/projetProg/arm_simulator-1.1/Examples
+abs_srcdir = /home/o/ochiers/PROG/projet/projetProg/arm_simulator-1.1/Examples
+abs_top_builddir = /home/o/ochiers/PROG/projet/projetProg/arm_simulator-1.1/Examples
+abs_top_srcdir = /home/o/ochiers/PROG/projet/projetProg/arm_simulator-1.1/Examples
 ac_ct_CC = 
 am__include = include
 am__leading_dot = .
@@ -264,7 +282,7 @@ host_alias = arm-elf
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/s/sidlakhr/Desktop/Boulot/s1/prog5/projet/rendu/projetProg/arm_simulator-1.1/build-aux/install-sh
+install_sh = ${SHELL} /home/o/ochiers/PROG/projet/projetProg/arm_simulator-1.1/build-aux/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -292,6 +310,9 @@ example1_SOURCES = example1.s
 example2_SOURCES = example2.s
 example3_SOURCES = example3.s
 example4_SOURCES = example4.s
+exampleLoadStore_SOURCES = exampleLoadStore.s
+exampleDataProcessing_SOURCES = exampleDataProcessing.s
+exampleDataProcessingSave_SOURCES = exampleDataProcessingSave.s
 insertion_sort_SOURCES = insertion_sort.c
 EXTRA_DIST = linker_script
 all: config.h
@@ -367,6 +388,18 @@ example3$(EXEEXT): $(example3_OBJECTS) $(example3_DEPENDENCIES) $(EXTRA_example3
 example4$(EXEEXT): $(example4_OBJECTS) $(example4_DEPENDENCIES) $(EXTRA_example4_DEPENDENCIES) 
 	@rm -f example4$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(example4_OBJECTS) $(example4_LDADD) $(LIBS)
+
+exampleDataProcessing$(EXEEXT): $(exampleDataProcessing_OBJECTS) $(exampleDataProcessing_DEPENDENCIES) $(EXTRA_exampleDataProcessing_DEPENDENCIES) 
+	@rm -f exampleDataProcessing$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(exampleDataProcessing_OBJECTS) $(exampleDataProcessing_LDADD) $(LIBS)
+
+exampleDataProcessingSave$(EXEEXT): $(exampleDataProcessingSave_OBJECTS) $(exampleDataProcessingSave_DEPENDENCIES) $(EXTRA_exampleDataProcessingSave_DEPENDENCIES) 
+	@rm -f exampleDataProcessingSave$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(exampleDataProcessingSave_OBJECTS) $(exampleDataProcessingSave_LDADD) $(LIBS)
+
+exampleLoadStore$(EXEEXT): $(exampleLoadStore_OBJECTS) $(exampleLoadStore_DEPENDENCIES) $(EXTRA_exampleLoadStore_DEPENDENCIES) 
+	@rm -f exampleLoadStore$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(exampleLoadStore_OBJECTS) $(exampleLoadStore_LDADD) $(LIBS)
 
 insertion_sort$(EXEEXT): $(insertion_sort_OBJECTS) $(insertion_sort_DEPENDENCIES) $(EXTRA_insertion_sort_DEPENDENCIES) 
 	@rm -f insertion_sort$(EXEEXT)
