@@ -46,10 +46,10 @@ void arm_exception(arm_core p, unsigned char exception)
 			arm_write_usr_register(p, PC_USER, 0);
 			break;
 		case UNDEFINED_INSTRUCTION:
-			addr	= arm_read_register(p, 15);
+			addr	= arm_read_register(p, PC_USER);
 			cpsr	= arm_read_cpsr(p);
 			spsr	= cpsr;
-			cpsr	&= UND;						// Passer en mode UND 
+			cpsr	&= UND;						// Passer en mode UND
 			cpsr	&= ~(1 << 5);					// Interpreter le code en ARM
 			cpsr	|= 1 << 7;					// Interdire les interruptions
 			#ifdef BIG_ENDIAN_SIMULATOR
