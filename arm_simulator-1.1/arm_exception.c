@@ -37,15 +37,35 @@ Contact: Guillaume.Huard@imag.fr
 
 void arm_exception(arm_core p, unsigned char exception)
 {
+	uint32_t addr, cpsr, spsr;
+
 	switch(exception)
 	{
 		case RESET:							// Semantics of reset interrupt (ARM manual A2-18)
 			arm_write_cpsr(p, 0x1d3 | Exception_bit_9);
 			arm_write_usr_register(p, PC_USER, 0);
 			break;
+		case UNDEFINED_INSTRUCTION:
+			addr	= arm_read_register(p, 15);
+			cpsr	= arm_read_cpsr(p);
+			spsr	= cpsr;
+			cpsr	&= UND;						// Passer en mode UND 
+			cpsr	&= ~(1 << 5);					// Interpreter le code en ARM
+			cpsr	|= 1 << 7;					// Interdire les interruptions
+			#ifdef BIG_ENDIAN_SIMULATOR
+			cpsr	|= 1 << 9;					// Bit endiane = BIG_ENDIAN
+			#else
+			cpsr	&= ~(1 << 9);					// Bit endiane = LITLE_ENDIAN
+			#endif
+			arm_write_cpsr(p, cpsr);
+			arm_write_register(p, 14, addr);
+			arm_write_spsr(p, spsr);
+			arm_write_register(p, 15, 0x00000004);			// Ecriture de pc ~(high_vectors_configured)
+			break;
+		case SOFTWARE_INTERRUPT:
+			
+			break;
 /*%%%%%%%%%%%%%%%%%%%%%%% Tous  le reste doit etre en commentaire jusqu'au test de instruction
-#define UNDEFINED_INSTRUCTION	2
-#define SOFTWARE_INTERRUPT      3
 #define PREFETCH_ABORT          4
 #define DATA_ABORT              5
 #define INTERRUPT               6

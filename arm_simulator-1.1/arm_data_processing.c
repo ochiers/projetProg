@@ -235,18 +235,6 @@ void readOperand(arm_core p, uint32_t ins, uint32_t *o0, uint32_t *o1, uint8_t *
 		if (rotate_imm == 0)	*shifter_carry_out = get_bit(arm_read_cpsr(p), CPSR_C);
 		else			*shifter_carry_out = get_bit(ins, 31);
 		sprintf(description, " Operande Immediat %u + rotation droite de %u", immed, rotate_imm*2);
-
-
-
-
-
-
-
-
-
-
-
-
 	}
 	else											//	Cas d'un registre
 	{
