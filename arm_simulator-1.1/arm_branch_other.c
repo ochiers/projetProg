@@ -208,12 +208,10 @@ void print_information_instruction_B_BL(arm_core p,	uint32_t instruction){
 }
 
 void print_information_instruction_BLX(arm_core p,	uint32_t instruction){ 
-	uint32_t cond, champ_Rm;
-	cond = get_bits(instruction, 31, 28);
+	uint32_t champ_Rm;
 	champ_Rm = get_bits(instruction, 4, 0);
 	printf("\t----------------------------------------\n");
 	printf("\t Branch Link eXchange \n");
-	printf("\t\t* cond \t\t\t: "); printBin(cond, 4, 1);
 	printf("\t\t* Rm\t\t\t: "); printBin(champ_Rm, 4, 1);	
 	printf("\t\t* target address\t: \t %X \n", arm_read_register(p, 1)); 
 	printf("\t----------------------------------------\n");
