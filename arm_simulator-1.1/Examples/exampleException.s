@@ -23,6 +23,7 @@ main:
 @@ ----------------------------------------
 @@ Declaration des traitants d'interruption
 @@ ----------------------------------------
+handler_reset:			b main
 handler_irq:			mov r0, #123
 				subs pc, lr, #4		@ place egalement SPSR dans CPSR
 handler_undefined_instruction:	mov r4, #6
@@ -44,7 +45,7 @@ handler_fiq:			mov r7, #10
 @@ Devraient etre a l'adresse 0x0
 @@ ----------------------------------------
 .org 0xFE0
-_reset			: b main				@0xFE0
+_reset			: b handler_reset			@0x1000 (car .org avec déclage de 20 cf le joker)
 _undefined_instruction	: b handler_undefined_instruction	@0xFE4
 _swi			: b handler_swi				@0xFE8
 _prefetch_abort		: b handler_prefetch_abort		@0xFEC
