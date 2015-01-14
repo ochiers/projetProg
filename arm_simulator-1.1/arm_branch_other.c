@@ -196,14 +196,12 @@ int arm_coprocessor_others_swi(arm_core p, uint32_t ins) {
 }
 
 void print_information_instruction_B_BL(arm_core p,	uint32_t instruction){ 
-	uint32_t cond, Link, champ_signed_immed_24;
-	cond = get_bits(instruction, 31, 28);
+	uint32_t Link, champ_signed_immed_24;
 	Link = get_bit(instruction, 24);
 	champ_signed_immed_24=get_bits(instruction, 24, 0);
 	
 	printf("\t----------------------------------------\n");
 	printf("\t BRANCH (AND LINK) \n");
-	printf("\t\t* cond \t\t\t: "); printBin(cond, 4, 1);
 	printf("\t\t* L(ink)\t\t: "); printBin(Link, 1, 1);
 	printf("\t\t* signed_immed_24\t: (%d)", champ_signed_immed_24); printBin(champ_signed_immed_24, 24, 1);
 	printf("\t----------------------------------------\n");
