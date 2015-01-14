@@ -26,7 +26,7 @@ Contact: Guillaume.Huard@imag.fr
 
 // Adresse dans la memoire du simulateur des vecteurs d'interuption
 // Permet de corriger l'erreur de GDB qui ne charge pas les vecteurs d'interrptions à leur adresse	reelle
-#define FAKE_INTERUPT_VECT	0x1000
+#define FAKE_INTERUPT_VECT	0xFFC
 
 /* ARM Modes */
 #define USR 0x10

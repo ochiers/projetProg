@@ -50,7 +50,6 @@ _swi			: b handler_swi				@FE8
 _prefetch_abort		: b handler_prefetch_abort		@FEC
 _data_abort		: b handler_data_abort			@FF0
 _irq			: b handler_irq				@FF4
-_fiq			: b main			@FF8 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+_fiq			: b handler_fiq
 
 
