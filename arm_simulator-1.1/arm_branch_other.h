@@ -21,34 +21,36 @@ Contact: Guillaume.Huard@imag.fr
          51 avenue Jean Kuntzmann
          38330 Montbonnot Saint-Martin
 */
+
 #ifndef __ARM_BRANCH_OTHER_H__
 #define __ARM_BRANCH_OTHER_H__
 #include <stdint.h>
 #include "arm_core.h"
 
 int arm_branch(arm_core p, uint32_t ins);
-
-int arm_mrs(arm_core p, uint32_t ins);
-
-/* move immediate to status register*/
-int arm_msr_immediate_operand(arm_core p, uint32_t ins);
-int arm_msr_register_operand(arm_core p, uint32_t ins);
-
 //!!! L'utilisation de BLX avec un registre contenant une adresse impaire fait passer au jeu d'instruction Thumb
 // Cette fonctionnalité n'étant (pas encore ;) implémenter,
 // BLX NE DOIT ETRE APPELÉ QUE SUR DES REGISTRES CONTENANT DES ADRESSES PAIRES
 int arm_branch_X(arm_core p, uint32_t ins);
-int arm_coprocessor_others_swi(arm_core p, uint32_t ins);
 int arm_miscellaneous(arm_core p, uint32_t ins);
 
-uint32_t lecture_entier_immediat_signe_24bits(uint32_t instruction);
+//MSR
+int arm_msr_immediate_operand(arm_core p, uint32_t ins);
+int arm_msr_register_operand(arm_core p, uint32_t ins);
 
+//MRS
+int arm_mrs(arm_core p, uint32_t ins);
+
+int partie_commune_msr(arm_core p, uint32_t ins, uint32_t operande);
+int arm_coprocessor_others_swi(arm_core p, uint32_t ins);
+
+//Fonction d'affichage des valeurs
 void print_information_instruction_B_BL(arm_core p,	uint32_t instruction);
 void print_information_instruction_BLX(arm_core p,	uint32_t instruction);
 void print_information_instruction_MRS(arm_core p, uint32_t instruction, uint8_t R);
 void print_information_instruction_MSR(arm_core p, uint32_t instruction);
 
-int partie_commune_msr(arm_core p, uint32_t ins, uint32_t operande);
+
 
 
 #endif

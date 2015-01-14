@@ -29,8 +29,7 @@ Contact: Guillaume.Huard@imag.fr
 #define LR 14
 #define PC 15
 
-
-uint32_t lecture_entier_immediat_signe_24bits(uint32_t instruction){
+static uint32_t lecture_entier_immediat_signe_24bits(uint32_t instruction){
 	uint32_t valeur = get_bits(instruction, 24, 0);
 	if (valeur & (1 << 23)) { //Si le bit 23 est à 1: valeur negative, on complete avec des 1 pour passer en signé sur 32 bits
 		valeur = valeur | 0xFF000000;
@@ -266,5 +265,3 @@ void print_information_instruction_MRS(arm_core p, uint32_t instruction, uint8_t
 	printf("\t\t* Rd \t\t\t: "); printBin(arm_read_register(p, reg_dest), 32, 1);;	
 	printf("\t----------------------------------------\n");
 }
-
-
