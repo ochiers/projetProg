@@ -174,28 +174,32 @@ int sous_categorie_load_store(uint32_t instruction) {
 // ------------------------------------------------------
 // Affiche le code de la condition et sa definition
 // ------------------------------------------------------
-void affichage_condition(uint32_t instruction) {
+void affichage_condition(arm_core p, uint32_t instruction) {
 	uint8_t condition = (instruction >> 28);
 
 	printf("\t- Condition\t\t: ");	printBin(condition, 4, 0);printf("\t");
 	switch (condition) {
-		case 0:	printf("Z = 1\n");			break;
-		case 1:	printf("Z = 0\n");			break;
-		case 2:	printf("C = 1\n");			break;
-		case 3:	printf("C = 0\n");			break;
-		case 4:	printf("N = 1\n");			break;
-		case 5:	printf("N = 0\n");			break;
-		case 6:	printf("V = 1\n");			break;
-		case 7:	printf("V = 0\n");			break;
-		case 8:	printf("C = 1 && Z = 0\n");	break;
-		case 9:	printf("C = 0 && Z = 1\n");	break;
-		case 10:printf("N = V\n");			break;
-		case 11:printf("N != V\n");			break;
-		case 12:printf("Z = 0 && N = V\n");	break;
-		case 13:printf("Z = 1 || N != V\n");break;
-		case 14:printf("Always\n");			break;
-		case 15:printf("miscellaneous\n");	break;
+		case 0:	printf("Z = 1");			break;
+		case 1:	printf("Z = 0");			break;
+		case 2:	printf("C = 1");			break;
+		case 3:	printf("C = 0");			break;
+		case 4:	printf("N = 1");			break;
+		case 5:	printf("N = 0");			break;
+		case 6:	printf("V = 1");			break;
+		case 7:	printf("V = 0");			break;
+		case 8:	printf("C = 1 && Z = 0");	break;
+		case 9:	printf("C = 0 && Z = 1");	break;
+		case 10:printf("N = V");			break;
+		case 11:printf("N != V");			break;
+		case 12:printf("Z = 0 && N = V");	break;
+		case 13:printf("Z = 1 || N != V");break;
+		case 14:printf("Always");			break;
+		case 15:printf("miscellaneous");	break;
 	}
+	if (!evaluer_condition(p, instruction))
+		printf("   ***** Condition non respectée****** \n");
+	else 
+		printf("\n");
 }
 // ------------------------------------------
 // Execute une instruction
@@ -212,18 +216,16 @@ static int arm_execute_instruction(arm_core p) {
 		return PREFETCH_ABORT;
 	}
 	printf("\nInstruction:\t"); printBin(instruction, 32, 1);
-	affichage_condition(instruction);
+	affichage_condition(p, instruction);
 	champ_categorie = (instruction >> 25) & 0x7;
-	printf("\t- Instruction\t\t: "); printBin(champ_categorie, 3, 0); printf("\t");
-
+	
 	condition = evaluer_condition(p, instruction);
 	categorie = evaluer_categorie(p, instruction);
-    
+
 	if (!condition) {
-		printf("***** Condition non respectée****** \n");
-		return UNDEFINED_INSTRUCTION;
+		return SUCCESS;
 	} else if (condition == 1) {
-		printf("Fonction utilisée: ");	
+		printf("\t- Instruction\t\t: "); printBin(champ_categorie, 3, 0); printf("\tFonction utilisée: ");	
 		switch (categorie) {
 			case PROCESSING_SHIFT:
 				printf("arm_data_processing_shift\n");			
@@ -281,6 +283,7 @@ static int arm_execute_instruction(arm_core p) {
 				break;
 		}
 	} else if (condition == 2) {
+		printf("\t- Instruction\t\t: "); printBin(champ_categorie, 3, 0); printf("\tFonction utilisée: ");
 		printf("arm_miscellaneous\n");
 		resultat = arm_miscellaneous(p, instruction);
 	}
