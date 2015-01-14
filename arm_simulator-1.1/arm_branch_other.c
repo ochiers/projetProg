@@ -206,7 +206,7 @@ void print_information_instruction_B_BL(arm_core p,	uint32_t instruction){
 	printf("\t BRANCH (AND LINK) \n");
 	printf("\t\t* cond \t\t\t: "); printBin(cond, 4, 1);
 	printf("\t\t* L(ink)\t\t: "); printBin(Link, 1, 1);
-	printf("\t\t* signed_immed_24\t: "); printBin(champ_signed_immed_24, 24, 1);
+	printf("\t\t* signed_immed_24\t: (%d)", champ_signed_immed_24); printBin(champ_signed_immed_24, 24, 1);
 	printf("\t----------------------------------------\n");
 }
 

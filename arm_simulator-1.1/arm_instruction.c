@@ -209,7 +209,7 @@ static int arm_execute_instruction(arm_core p) {
 	resultat = arm_fetch(p, &instruction);
 	if (resultat == -1) {
 		printf("erreur de fetch. %d\n", resultat);
-		return 0;
+		return PREFETCH_ABORT;
 	}
 	printf("\nInstruction:\t"); printBin(instruction, 32, 1);
 	affichage_condition(instruction);
@@ -221,6 +221,7 @@ static int arm_execute_instruction(arm_core p) {
     
 	if (!condition) {
 		printf("***** Condition non respectée****** \n");
+		return UNDEFINED_INSTRUCTION;
 	} else if (condition == 1) {
 		printf("Fonction utilisée: ");	
 		switch (categorie) {

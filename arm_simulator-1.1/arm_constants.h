@@ -24,6 +24,10 @@ Contact: Guillaume.Huard@imag.fr
 #define __ARM_CONSTANTS_H__
 #include <stdint.h>
 
+// Adresse dans la memoire du simulateur des vecteurs d'interuption
+// Permet de corriger l'erreur de GDB qui ne charge pas les vecteurs d'interrptions à leur adresse	reelle
+#define FAKE_INTERUPT_VECT	0x1000
+
 /* ARM Modes */
 #define USR 0x10
 #define FIQ 0x11
