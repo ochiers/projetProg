@@ -54,7 +54,6 @@ void arm_exception_traitement_commun(arm_core p, uint8_t offset_pc, char positif
 	if (updateSPSR)	arm_write_spsr(p, spsr);
 	arm_write_register(p, 15, interruptVectAdr);			// Branchement sur le vecteur d'interruption si VE == 0 (voir coprocesseur)
 									// ~(high_vectors_configured)
-printf("\n\n********vect = %u*****\n", interruptVectAdr);
 }
 // ------------------------------------------
 // Traite les 7 types d'exception gerees par le processeur
@@ -73,8 +72,8 @@ void arm_exception(arm_core p, unsigned char exception)
 		case UNDEFINED_INSTRUCTION:	arm_exception_traitement_commun(p, 0, 0, UND, 0, 0, 1, 1, 0x00000004+FAKE_INTERUPT_VECT);	break;
 		case SOFTWARE_INTERRUPT:	arm_exception_traitement_commun(p, 0, 1, SVC, 0, 0, 1, 1, 0x00000008+FAKE_INTERUPT_VECT);	break;
 		case PREFETCH_ABORT:		arm_exception_traitement_commun(p, 4, 1, ABT, 0, 0, 1, 1, 0x0000000C+FAKE_INTERUPT_VECT);	break;
-		case DATA_ABORT:		arm_exception_traitement_commun(p, 8, 1, ABT, 0, 0, 1, 1, 0x00000010+FAKE_INTERUPT_VECT);	break;
-		case INTERRUPT:			arm_exception_traitement_commun(p, 4, 1, IRQ, 0, 1, 1, 1, 0x00000018+FAKE_INTERUPT_VECT);	break;
+		case DATA_ABORT:			arm_exception_traitement_commun(p, 8, 1, ABT, 0, 0, 1, 1, 0x00000010+FAKE_INTERUPT_VECT);	break;
+		case INTERRUPT:				arm_exception_traitement_commun(p, 4, 1, IRQ, 0, 1, 1, 1, 0x00000018+FAKE_INTERUPT_VECT);	break;
 		case FAST_INTERRUPT:		arm_exception_traitement_commun(p, 4, 1, FIQ, 1, 1, 1, 1, 0x0000001C+FAKE_INTERUPT_VECT);	break;
 		default:
 			printf("\n\n**** Traitement d'execption ****\n");
