@@ -245,6 +245,7 @@ int arm_load_store_multiple(arm_core p, uint32_t ins) {
 	uint8_t S = get_bit(ins, 22);
 	uint8_t W = get_bit(ins, 21);
 	uint8_t L = get_bit(ins, 20);
+	uint8_t M = get_bit(ins, 15);
 	
 	uint8_t Rn = get_bits(ins, 20, 16);	
 	
@@ -293,8 +294,8 @@ int arm_load_store_multiple(arm_core p, uint32_t ins) {
 		
 	if (L) { /* Load */
 		i = 0;
-		while (numberOfRegister && startAddress <= endAddress) {
-			while (!listOfRegister[i] && i < 16) {
+		while (numberOfRegister && startAddress <= endAddress) { /* LDM(2)*/
+			while (!listOfRegister[i] && i < 15) {
 				i++;
 			}
 			listOfRegister[i] = 0;
@@ -304,6 +305,23 @@ int arm_load_store_multiple(arm_core p, uint32_t ins) {
 			arm_write_register(p, i, value32);
 			startAddress += 4;
 			numberOfRegister--;
+		}
+		if (startAddress <= endAddress) {
+			if (!S) { /* LDM(1)*/
+				if (listOfRegister[15]) {
+					result = arm_read_word(p, startAddress, &value32);
+					arm_write_register(p, 15, value32 && 0xFFFFFFFC);
+					startAddress += 4;
+				}
+			}
+			else if (S && M) { /* LDM(3) */
+				if (arm_current_mode_has_spsr(arm_core p)) {
+					arm_write_cpsr(p, arm_read_spsr(p));
+				}
+				result = arm_read_word(p, startAddress, &value32);
+				arm_write_register(p, 15, value32);
+				startAddress += 4;
+			}
 		}
 	}
 	else { /* Store */
