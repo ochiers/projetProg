@@ -62,6 +62,9 @@ void arm_exception_traitement_commun(arm_core p, uint8_t offset_pc, char positif
 // ------------------------------------------
 void arm_exception(arm_core p, unsigned char exception)
 {
+	uint8_t fiq = (arm_read_cpsr(p) & (0x1<<6)) >> 6;
+	uint8_t irq = (arm_read_cpsr(p) & (0x1<<7)) >> 7;
+
 	switch(exception)
 	{
 		case RESET:								// Semantics of reset interrupt (ARM manual A2-18)
@@ -69,14 +72,18 @@ void arm_exception(arm_core p, unsigned char exception)
 			arm_exception_traitement_commun(p, 0, 0, SVC, 0, 0, 0, 0, 0);	// Le Vecteur d'interruption devrait etre 20 (et non 0)
 			arm_write_usr_register(p, PC_USER, 0);
 			break;
+		case INTERRUPT:
+			if (irq)		{printf("\n***** Traitement de IRQ en cours: nouveau signal IRQ ignore ****** \n");		break;}
+			else			arm_exception_traitement_commun(p, 4, 1, IRQ, 0, 1, 1, 1, 0x00000018+FAKE_INTERUPT_VECT);	break;
+		case FAST_INTERRUPT:
+			if (fiq)		{printf("\n***** Traitement de FIQ en cours: nouveau signal FIQ ignore ****** \n");		break;}
+			else			arm_exception_traitement_commun(p, 4, 1, FIQ, 1, 1, 1, 1, 0x0000001C+FAKE_INTERUPT_VECT);	break;
 		case UNDEFINED_INSTRUCTION:	arm_exception_traitement_commun(p, 0, 0, UND, 0, 0, 1, 1, 0x00000004+FAKE_INTERUPT_VECT);	break;
 		case SOFTWARE_INTERRUPT:	arm_exception_traitement_commun(p, 0, 1, SVC, 0, 0, 1, 1, 0x00000008+FAKE_INTERUPT_VECT);	break;
 		case PREFETCH_ABORT:		arm_exception_traitement_commun(p, 4, 1, ABT, 0, 0, 1, 1, 0x0000000C+FAKE_INTERUPT_VECT);	break;
-		case DATA_ABORT:			arm_exception_traitement_commun(p, 8, 1, ABT, 0, 0, 1, 1, 0x00000010+FAKE_INTERUPT_VECT);	break;
-		case INTERRUPT:				arm_exception_traitement_commun(p, 4, 1, IRQ, 0, 1, 1, 1, 0x00000018+FAKE_INTERUPT_VECT);	break;
-		case FAST_INTERRUPT:		arm_exception_traitement_commun(p, 4, 1, FIQ, 1, 1, 1, 1, 0x0000001C+FAKE_INTERUPT_VECT);	break;
+		case DATA_ABORT:		arm_exception_traitement_commun(p, 8, 1, ABT, 0, 0, 1, 1, 0x00000010+FAKE_INTERUPT_VECT);	break;
 		default:
-			printf("\n\n**** Traitement d'execption ****\n");
+			printf("\n\n**** Traitement d'exception ****\n");
 			printf("**** Exception non geree: %d ****\n", exception);
 			exit(0);
 	}

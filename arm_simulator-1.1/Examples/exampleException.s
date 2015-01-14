@@ -46,10 +46,10 @@ handler_fiq:			mov r7, #10
 .org 0xFE0
 _reset			: b main				@0xFE0
 _undefined_instruction	: b handler_undefined_instruction	@0xFE4
-_swi			: b handler_swi				@FE8
-_prefetch_abort		: b handler_prefetch_abort		@FEC
-_data_abort		: b handler_data_abort			@FF0
-_irq			: b handler_irq				@FF4
+_swi			: b handler_swi				@0xFE8
+_prefetch_abort		: b handler_prefetch_abort		@0xFEC
+_data_abort		: b handler_data_abort			@0xFF0
+_irq			: b handler_irq				@0xFF4
 _fiq			: b handler_fiq
 
 
