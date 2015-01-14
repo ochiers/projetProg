@@ -315,7 +315,7 @@ int arm_load_store_multiple(arm_core p, uint32_t ins) {
 				}
 			}
 			else if (S && M) { /* LDM(3) */
-				if (arm_current_mode_has_spsr(arm_core p)) {
+				if (arm_current_mode_has_spsr(p)) {
 					arm_write_cpsr(p, arm_read_spsr(p));
 				}
 				result = arm_read_word(p, startAddress, &value32);
