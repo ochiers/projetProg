@@ -182,7 +182,6 @@ int arm_data_processing_shift(arm_core p, uint32_t ins)
 	{
 		if (rd == 15)									//	Cas d'un changement de pc
 		{
-printf("\n\n\n****************%s*************\n\n", arm_get_mode_name(cpsr & 0x1F));
 			if (arm_current_mode_has_spsr(p)) arm_write_cpsr(p, arm_read_spsr(p));	//		CPSR <- SPSR
 			else ret = UNPREDICTABLE;
 		}

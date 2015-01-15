@@ -38,7 +38,8 @@ void arm_exception_traitement_commun(arm_core p, uint8_t offset_pc, char positif
 	else		addr -= offset_pc;
 	cpsr	= arm_read_cpsr(p);
 	spsr	= cpsr;
-	cpsr	&= mode;						// Changer de mode
+	cpsr	&= ~(0x1F);
+	cpsr	|= mode;						// Changer de mode
 	cpsr	&= ~(1 << 5);						// Interpreter le code en ARM
 	if (disableFIQ)		cpsr	|= 1 << 6;			// Interdire les interruptions normales (FIQ)
 	else			cpsr	&= ~(1 << 6);
