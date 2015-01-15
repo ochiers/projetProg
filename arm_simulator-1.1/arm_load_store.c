@@ -29,13 +29,20 @@ Contact: Guillaume.Huard@imag.fr
 uint32_t scaledRegisterSwitch(arm_core p, uint8_t shift, uint8_t shift_imm, uint32_t addressRn, uint32_t contentRm) {
 	uint32_t index = 0;
 	uint32_t cpsr = arm_read_cpsr(p);
-	uint8_t bitC = get_bit(cpsr, CPSR_C);
+	uint32_t bitC = get_bit(cpsr, CPSR_C);
+	
+	////////////////////////////////////////////
+	uint32_t debug_offset;
+	///////////////////////////////////////////
+	
+	
+	
 	switch (shift) {
 		case 0 : /* LSL */
 			index = contentRm << shift_imm;
 			break;
 		case 1 : /* LSR */
-			(!shift_imm) ? (index = 0) : (index = addressRn >> shift_imm);
+			(!shift_imm) ? (index = 0) : (index = (contentRm >> shift_imm));
 			break;
 		case 2 : /* ASR */
 			if (!shift_imm) {
@@ -47,7 +54,14 @@ uint32_t scaledRegisterSwitch(arm_core p, uint8_t shift, uint8_t shift_imm, uint
 			break;
 		case 3 : 
 			/* ROR or RRX */		/* RRX */ 									/* ROR */
-			(!shift_imm) ? ((index = bitC << 31) || (contentRm >> 1)) : (index = ror(contentRm, shift_imm));
+			if (!shift_imm) {
+				index = (contentRm >> 1) | (bitC << 31);
+				debug_offset= contentRm >> 1;
+				printf("\n\nindex : %d, bitC : %d, contentRm : %d \n decale de 1 a droite: %d", index, bitC, contentRm, debug_offset);
+			}
+			else {
+				index = ror(contentRm, shift_imm);
+			}
 			break;
 	}
 	return index;
@@ -107,12 +121,12 @@ int arm_load_store(arm_core p, uint32_t ins) {
 	printf("	- Rm : %d\n", Rm);
 	printf("	- addressRn : %d\n", addressRn);
 	printf("	- contentRm : %d\n", contentRm);
-	printf("	- contentRd : %d\n", contentRm);
+	printf("	- contentRd : %d\n", contentRd);
 	printf("\n	- Instruction : ");
 	
 	if(M) { /* Load/Store simple */
 		if (I == 0 && P == 1) { /* Immediate Offset, ARM-Doc p.460 */
-			(U) ? (address = addressRn + offset12) : (address = contentRm - offset12);
+			(U) ? (address = addressRn + offset12) : (address = addressRn - offset12);
 			if (W) /* Immediate Pre-indexed, ARM-Doc p.464 */
 				arm_write_register(p, Rn, address);
 		}
@@ -123,6 +137,7 @@ int arm_load_store(arm_core p, uint32_t ins) {
 		}
 		else if (I && P) { /* Scaled Register Offset, ARM-Doc p.463 */
 			index = scaledRegisterSwitch(p, shift, shift_imm, addressRn, contentRm);
+			printf("\nindex : %d \n\n",index);
 			(U) ? (address = addressRn + index) : (address = addressRn - index);
 			if (W) /* Scaled Register Pre-indexed, ARM-Doc p.466 */
 				arm_write_register(p, Rn, address);
