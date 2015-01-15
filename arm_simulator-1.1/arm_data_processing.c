@@ -215,13 +215,13 @@ int arm_data_processing_shift_mul(arm_core p, uint32_t ins)
 	oper		= malloc(sizeof(char) * 1024);
 
 	S	= (ins & 0x100000) >> 20;						// Parser l'instruction
-	rd	= (ins & 0x0F0000) >> 15;
+	rd	= (ins & 0x0F0000) >> 16;
 	rs	= (ins & 0x000F00) >> 8;
 	rm	= (ins & 0x00000F);
 	o0	= arm_read_register(p, rs);						// Calcule des operandes
 	o1	= arm_read_register(p, rm);
 	res	= o0 * o1;								// Calcul du resultat
-	sprintf(oper, "CMN");
+	sprintf(oper, "MUL");
 	sprintf(description, " Operande 0: Register %u (%u)\n", rs, o0);
 	sprintf(description, " Operande 1: Register %u (%u)\n", rm, o1);
 	arm_write_register(p, rd, res);							// Ecriture du resultat
