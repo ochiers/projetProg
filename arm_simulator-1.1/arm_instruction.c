@@ -81,6 +81,7 @@ int evaluer_condition(arm_core p, uint32_t instruction) {
 int evaluer_categorie(arm_core p, uint32_t instruction) {
 	int categorie = 0;
 	uint32_t champ_categorie = (instruction >> 25) & 0x7;
+	uint32_t champ_multiplie = get_bits(instruction, 28, 21);
 	uint32_t bit4, bit5, bit6, bit7, bit20, bit21, bit23, bit24;
 
 	bit4	= get_bit(instruction, 4);
@@ -98,7 +99,7 @@ int evaluer_categorie(arm_core p, uint32_t instruction) {
 				categorie = MISCELLANEOUS;		//ligne 2
 			else if (bit24 && !bit23 && !bit20 && !bit7 && bit4)	
 				categorie = MISCELLANEOUS;		//ligne 4
-			else if (bit7 && !bit6 && !bit5 && bit4)		
+			else if (!champ_multiplie && bit7 && !bit6 && !bit5 && bit4)		
 				categorie = MULTIPLIE;			//ligne 5
 			else if (bit7 && !(!bit6 && !bit5) && bit4)		
 				categorie = LOAD_STORE;			//ligne 5.5, Extra load/store
@@ -265,13 +266,10 @@ static int arm_execute_instruction(arm_core p) {
 				printf("arm_miscellaneous\n");
 				resultat = arm_miscellaneous(p, instruction);	
 				break;
-/*			case MULTIPLIE:
-				type = sous_categorie_branch_autres(instruction);
-				switch(type){
-					non implementé
-				}
-				break;
-*/			
+			case MULTIPLIE:
+				printf("arm_data_processing_shift_mul\n");			
+				resultat = arm_data_processing_shift_mul(p, instruction);
+				break;			
 			case SWI:
 				printf("arm_coprocessor_others_swi\n");
 				resultat = arm_coprocessor_others_swi(p, instruction);
