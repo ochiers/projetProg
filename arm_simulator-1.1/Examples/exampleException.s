@@ -25,17 +25,17 @@ main:
 @@ ----------------------------------------
 handler_reset:			b main
 handler_irq:			mov r0, #123
-				subs pc, lr, #4		@ place egalement SPSR dans CPSR
+				subs pc, lr, #4			@ place egalement SPSR dans CPSR
 handler_undefined_instruction:	mov r4, #6
-				subs pc, lr, #4		@ place egalement SPSR dans CPSR
+				subs pc, lr, #4			@ place egalement SPSR dans CPSR
 handler_swi:			mov r4, #7
-				subs pc, lr, #4		@ place egalement SPSR dans CPSR
+				subs pc, lr, #4			@ place egalement SPSR dans CPSR
 handler_prefetch_abort:		mov r4, #8
-				subs pc, lr, #4		@ place egalement SPSR dans CPSR
+				subs pc, lr, #4			@ place egalement SPSR dans CPSR
 handler_data_abort:		mov r4, #9
-				subs pc, lr, #4		@ place egalement SPSR dans CPSR
+				subs pc, lr, #4			@ place egalement SPSR dans CPSR
 handler_fiq:			mov r7, #10
-				subs pc, lr, #4		@ place egalement SPSR dans CPSR
+				subs pc, lr, #4			@ place egalement SPSR dans CPSR
 
 
 
@@ -50,7 +50,7 @@ _undefined_instruction	: b handler_undefined_instruction	@0xFE4
 _swi			: b handler_swi				@0xFE8
 _prefetch_abort		: b handler_prefetch_abort		@0xFEC
 _data_abort		: b handler_data_abort			@0xFF0
-_irq			: b handler_irq				@0xFF4
-_fiq			: b handler_fiq
+_irq			: b handler_irq				@0xFF8
+_fiq			: b handler_fiq				@0XFFc
 
 

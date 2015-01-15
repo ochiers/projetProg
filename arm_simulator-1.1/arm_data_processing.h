@@ -23,6 +23,14 @@ char *oper;
 // ------------------------------------------
 	int arm_data_processing_shift(arm_core p, uint32_t ins);
 // ------------------------------------------
+// Decoding functions for the specific mul instructions
+// Execute la fonction
+// Met a jours le registre destination
+// Met a jour le registre d'etat cpsr en fonction du bit S et
+// de l'algo de la commande
+// ------------------------------------------
+	int arm_data_processing_shift_mul(arm_core p, uint32_t ins);
+// ------------------------------------------
 // Lit les valeur des registres dans l'instruction
 // Parametre d'entree:
 //	- p:			etat du processeur

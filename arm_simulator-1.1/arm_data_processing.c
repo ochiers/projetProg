@@ -199,6 +199,46 @@ int arm_data_processing_shift(arm_core p, uint32_t ins)
 	return ret;
 }
 // ------------------------------------------
+// Decoding functions for the specific mul instructions
+// Execute la fonction
+// Met a jours le registre destination
+// Met a jour le registre d'etat cpsr en fonction du bit S et
+// de l'algo de la commande
+// ------------------------------------------
+int arm_data_processing_shift_mul(arm_core p, uint32_t ins)
+{
+	uint32_t res=0, o0, o1;
+	uint32_t cpsr = arm_read_cpsr(p);
+	uint8_t rd, rn, S;
+
+	description	= malloc(sizeof(char) * 1024);
+	oper		= malloc(sizeof(char) * 1024);
+
+	S	= (ins & 0x100000) >> 20;						// Parser l'instruction
+	rd	= (ins & 0x0F0000) >> 15;
+	rs	= (ins & 0x000F00) >> 8;
+	rm	= (ins & 0x00000F);
+	o0	= arm_read_register(p, rs);						// Calcule des operandes
+	o1	= arm_read_register(p, rm);
+	res	= o0 * o1;								// Calcul du resultat
+	sprintf(oper, "CMN");
+	sprintf(description, " Operande 0: Register %u (%u)\n", rs, o0);
+	sprintf(description, " Operande 1: Register %u (%u)\n", rm, o1);
+	arm_write_register(p, rd, res);							// Ecriture du resultat
+	printInstrdataProcessingShiftOp(p, op, S, 0, rn, rd, o0, o1, res);		// Affichage
+	if (s)										// Mis a jours de flags
+	{
+		if (res == 0)		cpsr = set_bit(cpsr, CPSR_Z);			//		Flag Z
+		else			cpsr = clr_bit(cpsr, CPSR_Z);
+		if (get_bit(res, 31))	cpsr = set_bit(cpsr, CPSR_N);			//		Flag N
+		else			cpsr = clr_bit(cpsr, CPSR_N);
+		arm_write_cpsr(p, cpsr);
+	}
+	free(description);
+	free(oper);
+	return SECCESS;
+}
+// ------------------------------------------
 // Lit les valeur des registres dans l'instruction
 // Parametre d'entree:
 //	- p:			etat du processeur
@@ -226,9 +266,6 @@ void readOperand(arm_core p, uint32_t ins, uint32_t *o0, uint32_t *o1, uint8_t *
 	*I = (ins & 0x2000000) >> 25;								// Calcule Operande 1
 	if (*I)											//	Cas d'un immediat
 	{
-
-
-
 		immed		= (ins & 0x0FF);
 		rotate_imm	= (ins & 0xF00) >> 8;
 		*o1		= ror (immed, rotate_imm*2);

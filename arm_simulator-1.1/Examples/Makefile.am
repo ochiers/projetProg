@@ -4,7 +4,7 @@ AM_LDFLAGS=-nostdlib -T $(srcdir)/linker_script -n --entry main
 AM_LDFLAGS+=-Wl,-EB
 
 if HAVE_ARM_COMPILER
-noinst_PROGRAMS=example1 example2 example3 example4 exampleLoadStore exampleDataProcessing exampleDataProcessingSave exampleMrsMsr exampleException exampleCondition test_ldr insertion_sort
+noinst_PROGRAMS=example1 example2 example3 example4 exampleLoadStore exampleDataProcessing exampleDataProcessingSave exampleMrsMsr exampleException exampleCondition test_ldrinsertion_sort
 
 all-am: $(PROGS)
 endif
