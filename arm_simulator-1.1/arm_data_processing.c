@@ -209,7 +209,7 @@ int arm_data_processing_shift_mul(arm_core p, uint32_t ins)
 {
 	uint32_t res=0, o0, o1;
 	uint32_t cpsr = arm_read_cpsr(p);
-	uint8_t rd, rn, S;
+	uint8_t rd, rm,rs, S;
 
 	description	= malloc(sizeof(char) * 1024);
 	oper		= malloc(sizeof(char) * 1024);
@@ -225,8 +225,8 @@ int arm_data_processing_shift_mul(arm_core p, uint32_t ins)
 	sprintf(description, " Operande 0: Register %u (%u)\n", rs, o0);
 	sprintf(description, " Operande 1: Register %u (%u)\n", rm, o1);
 	arm_write_register(p, rd, res);							// Ecriture du resultat
-	printInstrdataProcessingShiftOp(p, op, S, 0, rn, rd, o0, o1, res);		// Affichage
-	if (s)										// Mis a jours de flags
+	printInstrdataProcessingShiftOp(p, 0, S, 0, rm, rd, o0, o1, res);		// Affichage
+	if (S)										// Mis a jours de flags
 	{
 		if (res == 0)		cpsr = set_bit(cpsr, CPSR_Z);			//		Flag Z
 		else			cpsr = clr_bit(cpsr, CPSR_Z);
@@ -236,7 +236,7 @@ int arm_data_processing_shift_mul(arm_core p, uint32_t ins)
 	}
 	free(description);
 	free(oper);
-	return SECCESS;
+	return SUCCESS;
 }
 // ------------------------------------------
 // Lit les valeur des registres dans l'instruction
