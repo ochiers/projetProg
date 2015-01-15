@@ -211,11 +211,12 @@ static int arm_execute_instruction(arm_core p) {
 	uint8_t champ_categorie;
 
 	resultat = arm_fetch(p, &instruction);
+	printf("\nInstruction:\t"); printBin(instruction, 32, 1);
+	printf("\t- Valeur de PC\t\t: %x\n", arm_read_register(p, 15));
 	if (resultat == -1) {
 		printf("erreur de fetch. %d\n", resultat);
 		return PREFETCH_ABORT;
 	}
-	printf("\nInstruction:\t"); printBin(instruction, 32, 1);
 	affichage_condition(p, instruction);
 	champ_categorie = (instruction >> 25) & 0x7;
 	
