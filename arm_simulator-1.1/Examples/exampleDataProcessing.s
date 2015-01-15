@@ -67,4 +67,8 @@ main:
 	/*mvn r0, r0, r1
 	mvn r0, r1, r3, ror r4*/
 	
+	mul r4, r5, r6
+	mul r6, r7, r8
+	mul r5, r8
+	
 	swi 0x123456
