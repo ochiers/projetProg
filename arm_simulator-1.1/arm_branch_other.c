@@ -241,7 +241,7 @@ void print_information_instruction_BLX(arm_core p,	uint32_t instruction){
 	printf("\t----------------------------------------\n");
 	printf("\t Branch Link eXchange \n");
 	printf("\t\t* Rm\t\t\t: "); printBin(champ_Rm, 4, 1);	
-	printf("\t\t* target address\t: \t %X \n", arm_read_register(p, 1)); 
+	printf("\t\t* target address\t: \t %X \n", arm_read_register(p, champ_Rm)); 
 	printf("\t----------------------------------------\n");
 }
 

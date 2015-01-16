@@ -4,7 +4,7 @@ AM_LDFLAGS=-nostdlib -T $(srcdir)/linker_script -n --entry main
 AM_LDFLAGS+=-Wl,-EB
 
 if HAVE_ARM_COMPILER
-noinst_PROGRAMS=example1 example2 example3 example4 exampleLoadStore exampleDataProcessing exampleDataProcessingSave exampleMrsMsr exampleException exampleCondition test_ldr test_ldrb test_ldrh insertion_sort
+noinst_PROGRAMS=example1 example2 example3 example4 exampleLoadStore exampleDataProcessing exampleDataProcessingSave exampleMrsMsr exampleException exampleCondition test_ldr test_ldrb test_ldrh exampleGeneral insertion_sort
 
 all-am: $(PROGS)
 endif
@@ -24,6 +24,7 @@ exampleCondition_SOURCES=exampleCondition.s
 test_ldr_SOURCES=test_ldr.s
 test_ldrb_SOURCES=test_ldrb.s
 test_ldrh_SOURCES=test_ldrh.s
+exampleGeneral_SOURCES=exampleGeneral.s
 insertion_sort_SOURCES=insertion_sort.c
 
 EXTRA_DIST=linker_script
