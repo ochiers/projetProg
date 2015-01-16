@@ -38,7 +38,8 @@ void arm_exception_traitement_commun(arm_core p, uint8_t offset_pc, char positif
 	else		addr -= offset_pc;
 	cpsr	= arm_read_cpsr(p);
 	spsr	= cpsr;
-	cpsr	&= mode;						// Changer de mode
+	cpsr	&= ~(0x1F);
+	cpsr	|= mode;						// Changer de mode
 	cpsr	&= ~(1 << 5);						// Interpreter le code en ARM
 	if (disableFIQ)		cpsr	|= 1 << 6;			// Interdire les interruptions normales (FIQ)
 	else			cpsr	&= ~(1 << 6);
@@ -69,9 +70,13 @@ void arm_exception(arm_core p, unsigned char exception)
 	{
 		case RESET:								// Semantics of reset interrupt (ARM manual A2-18)
 			arm_write_cpsr(p, 0x1d3 | Exception_bit_9);
-			arm_exception_traitement_commun(p, 0, 0, SVC, 0, 0, 0, 0, 0x1000/*******0x0+FAKE_INTERUPT_VECT*/);
-			arm_write_usr_register(p, PC_USER, 0);
+			arm_exception_traitement_commun(p, 0, 0, SVC, 0, 0, 0, 0, 0x0+FAKE_INTERUPT_VECT);
+			arm_write_usr_register(p, PC_USER, 0x1000);
 			break;
+		case UNDEFINED_INSTRUCTION:	arm_exception_traitement_commun(p, 0, 0, UND, 0, 0, 1, 1, 0x00000004+FAKE_INTERUPT_VECT);	break;
+		case SOFTWARE_INTERRUPT:	arm_exception_traitement_commun(p, 0, 1, SVC, 0, 0, 1, 1, 0x00000008+FAKE_INTERUPT_VECT);	break;
+		case PREFETCH_ABORT:		arm_exception_traitement_commun(p, 4, 1, ABT, 0, 0, 1, 1, 0x0000000C+FAKE_INTERUPT_VECT);	break;
+		case DATA_ABORT:		arm_exception_traitement_commun(p, 8, 1, ABT, 0, 0, 1, 1, 0x00000010+FAKE_INTERUPT_VECT);	break;
 		case INTERRUPT:
 			if (irq)		printf("\n***** Traitement de IRQ en cours: nouveau signal IRQ ignore ****** \n");
 			else			arm_exception_traitement_commun(p, 0, 1, IRQ, 0, 1, 1, 1, 0x00000018+FAKE_INTERUPT_VECT);
@@ -80,10 +85,6 @@ void arm_exception(arm_core p, unsigned char exception)
 			if (fiq)		printf("\n***** Traitement de FIQ en cours: nouveau signal FIQ ignore ****** \n");
 			else			arm_exception_traitement_commun(p, 0, 1, FIQ, 1, 1, 1, 1, 0x0000001C+FAKE_INTERUPT_VECT);
 			break;
-		case UNDEFINED_INSTRUCTION:	arm_exception_traitement_commun(p, 0, 0, UND, 0, 0, 1, 1, 0x00000004+FAKE_INTERUPT_VECT);	break;
-		case SOFTWARE_INTERRUPT:	arm_exception_traitement_commun(p, 0, 1, SVC, 0, 0, 1, 1, 0x00000008+FAKE_INTERUPT_VECT);	break;
-		case PREFETCH_ABORT:		arm_exception_traitement_commun(p, 4, 1, ABT, 0, 0, 1, 1, 0x0000000C+FAKE_INTERUPT_VECT);	break;
-		case DATA_ABORT:		arm_exception_traitement_commun(p, 8, 1, ABT, 0, 0, 1, 1, 0x00000010+FAKE_INTERUPT_VECT);	break;
 		default:
 			printf("\n\n**** Traitement d'exception ****\n");
 			printf("**** Exception non geree: %d ****\n", exception);
